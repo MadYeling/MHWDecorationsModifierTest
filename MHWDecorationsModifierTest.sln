@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MHWDecorationsModifierTest", "MHWDecorationsModifierTest\MHWDecorationsModifierTest.csproj", "{0BEE65DA-0ACC-4094-B790-35F9A00F8476}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MHWDecorationsModifier", "MHWDecorationsModifier\MHWDecorationsModifier.csproj", "{E6FD5813-BECD-4C00-AD52-E14F63436DF4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug x64|x64 = Debug x64|x64
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BEE65DA-0ACC-4094-B790-35F9A00F8476}.Debug x64|x64.ActiveCfg = Debug x64|x64
+		{0BEE65DA-0ACC-4094-B790-35F9A00F8476}.Debug x64|x64.Build.0 = Debug x64|x64
+		{0BEE65DA-0ACC-4094-B790-35F9A00F8476}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BEE65DA-0ACC-4094-B790-35F9A00F8476}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BEE65DA-0ACC-4094-B790-35F9A00F8476}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BEE65DA-0ACC-4094-B790-35F9A00F8476}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BEE65DA-0ACC-4094-B790-35F9A00F8476}.Release|x64.ActiveCfg = Release|x64
+		{0BEE65DA-0ACC-4094-B790-35F9A00F8476}.Release|x64.Build.0 = Release|x64
+		{E6FD5813-BECD-4C00-AD52-E14F63436DF4}.Debug x64|x64.ActiveCfg = Debug x64|x64
+		{E6FD5813-BECD-4C00-AD52-E14F63436DF4}.Debug x64|x64.Build.0 = Debug x64|x64
+		{E6FD5813-BECD-4C00-AD52-E14F63436DF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6FD5813-BECD-4C00-AD52-E14F63436DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6FD5813-BECD-4C00-AD52-E14F63436DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6FD5813-BECD-4C00-AD52-E14F63436DF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6FD5813-BECD-4C00-AD52-E14F63436DF4}.Release|x64.ActiveCfg = Release|x64
+		{E6FD5813-BECD-4C00-AD52-E14F63436DF4}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B8EA5632-9DBD-4404-AEC0-ABD80C4C3F19}
+	EndGlobalSection
+EndGlobal
