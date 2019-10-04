@@ -3,16 +3,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
+using System.Windows;
 using NLog;
 
-namespace MHWDecorationsModifier
+namespace MHWDecorationsModifier.Code
 {
     public class MemoryOperator
     {
         #region 申明API
 
         //打开一个已存在的进程对象，并返回进程的句柄
-        [DllImportAttribute("kernel32.dll", EntryPoint = "OpenProcess")]
+        [DllImport("kernel32.dll", EntryPoint = "OpenProcess")]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
         //从指定内存中读取字节集数据
@@ -21,7 +22,7 @@ namespace MHWDecorationsModifier
             IntPtr lpNumberOfBytesRead);
 
         //从指定内存中写入字节集数据
-        [DllImportAttribute("kernel32.dll", EntryPoint = "WriteProcessMemory")]
+        [DllImport("kernel32.dll", EntryPoint = "WriteProcessMemory")]
         private static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, int[] lpBuffer, int nSize,
             IntPtr lpNumberOfBytesWritten);
 
@@ -45,6 +46,7 @@ namespace MHWDecorationsModifier
             if (_pid == 0)
             {
                 Logger.Error("无法获取进程PID");
+                MessageBox.Show("无法获取进程PID，可能是你还没有打开游戏，或者被杀毒软件禁止", "警告");
                 Environment.Exit(1);
             }
             else
@@ -83,6 +85,7 @@ namespace MHWDecorationsModifier
             {
                 Logger.Fatal(accessViolationException.ToString());
                 // 此错误后果可能非常严重需要关闭进程
+                MessageBox.Show("发生严重错误，进程已关闭", "警告");
                 Environment.Exit(-1);
                 return false;
             }
@@ -121,6 +124,7 @@ namespace MHWDecorationsModifier
             {
                 Logger.Fatal(accessViolationException.ToString());
                 // 此错误后果可能非常严重需要关闭进程
+                MessageBox.Show("发生严重错误，进程已关闭", "警告");
                 Environment.Exit(-1);
                 return 0;
             }

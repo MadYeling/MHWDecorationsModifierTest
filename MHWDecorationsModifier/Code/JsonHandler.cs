@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Windows;
 using MHWDecorationsModifier.Beans;
 using MHWDecorationsModifier.MyException;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
 
-namespace MHWDecorationsModifier
+namespace MHWDecorationsModifier.Code
 {
     public class JsonHandler
     {
@@ -36,9 +37,9 @@ namespace MHWDecorationsModifier
 
         public readonly int SignatureLength;
 
-        public const int Archive1 = 0;
-        public const int Archive2 = 1;
-        public const int Archive3 = 2;
+        public const int Archive1 = 1;
+        public const int Archive2 = 2;
+        public const int Archive3 = 3;
 
         /// <summary>
         /// 构造函数，只在这里读取文件
@@ -50,6 +51,7 @@ namespace MHWDecorationsModifier
             _codeToName = ReadAllName();
             SignatureLength = ReadSignature().Length;
             if (_jToken != null) return;
+            MessageBox.Show("无法读取JSON文件", "警告");
             Logger.Error("无法读取JSON文件");
             Environment.Exit(1);
         }
@@ -224,6 +226,7 @@ namespace MHWDecorationsModifier
             var codeToken = iJToken[keyWord];
             if (codeToken != null) return codeToken;
             Logger.Error("无法找到字段：\"" + keyWord + "\"");
+            MessageBox.Show("无法找到字段：\"" + keyWord + "\"，请检查json文件", "警告");
             throw new InvalidKeyWordException("无效的JSON字段！");
         }
 

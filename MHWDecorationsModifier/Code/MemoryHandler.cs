@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using MHWDecorationsModifier.Beans;
 using NLog;
 
-namespace MHWDecorationsModifier
+namespace MHWDecorationsModifier.Code
 {
     public class MemoryHandler
     {
@@ -83,6 +84,7 @@ namespace MHWDecorationsModifier
             }
 
             Logger.Error("无法寻找到特征码");
+            MessageBox.Show("无法寻找到特征码，请联系作者", "警告");
             return 0;
         }
 

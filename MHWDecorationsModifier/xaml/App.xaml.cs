@@ -1,4 +1,4 @@
-﻿namespace MHWDecorationsModifier
+﻿namespace MHWDecorationsModifier.xaml
 {
     /// <summary>
     /// Interaction logic for App.xaml
