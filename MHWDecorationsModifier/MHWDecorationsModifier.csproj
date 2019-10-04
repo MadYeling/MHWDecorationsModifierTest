@@ -86,12 +86,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Beans\ArchiveBean.cs" />
+    <Compile Include="Beans\DecorationBean.cs" />
+    <Compile Include="JsonHandler.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MemoryHandler.cs" />
+    <Compile Include="MemoryOperator.cs" />
     <Compile Include="MyException\InvalidKeyWordException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
