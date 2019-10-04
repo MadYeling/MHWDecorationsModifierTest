@@ -63,7 +63,7 @@ namespace MHWDecorationsModifierTest
             try
             {
                 const string keyWord = "ProcessName";
-                var token = VerifyKeyWord(keyWord);
+                var token = VerifyKeyWord(keyWord, _jToken);
                 return token.ToString();
             }
             catch (Exception e)
@@ -82,7 +82,7 @@ namespace MHWDecorationsModifierTest
             try
             {
                 const string keyWord = "Signature";
-                var signatureToken = VerifyKeyWord(keyWord);
+                var signatureToken = VerifyKeyWord(keyWord, _jToken);
                 var signature = signatureToken.ToString().Split(' ');
                 return signature;
             }
@@ -103,7 +103,7 @@ namespace MHWDecorationsModifierTest
             try
             {
                 const string keyWord = "Codes";
-                var codeToken = VerifyKeyWord(keyWord);
+                var codeToken = VerifyKeyWord(keyWord, _jToken);
 
                 // 将读取的内容转换为JSON数组
                 var jArray = JArray.Parse(codeToken.ToString());
@@ -131,6 +131,9 @@ namespace MHWDecorationsModifierTest
         {
             try
             {
+                const string acKey = "Archive";
+                var acToken = VerifyKeyWord(acKey, _jToken);
+
                 string keyWord;
                 switch (archive)
                 {
@@ -148,7 +151,7 @@ namespace MHWDecorationsModifierTest
                         break;
                 }
 
-                var archiveToken = VerifyKeyWord(keyWord);
+                var archiveToken = VerifyKeyWord(keyWord, acToken);
 
                 var firstScanAddress = Convert.ToInt64(archiveToken["firstScanAddress"].ToString(), 16);
                 var lastScanAddress = Convert.ToInt64(archiveToken["lastScanAddress"].ToString(), 16);
@@ -177,7 +180,7 @@ namespace MHWDecorationsModifierTest
                 // 获取代码集合
                 var codes = ReadCode();
                 // 从json中取出需要的那部分内容
-                var name = VerifyKeyWord(keyWord);
+                var name = VerifyKeyWord(keyWord, _jToken);
 
                 // 遍历集合
                 foreach (var code in codes)
@@ -213,11 +216,12 @@ namespace MHWDecorationsModifierTest
         /// 校验关键字
         /// </summary>
         /// <param name="keyWord">关键字</param>
+        /// <param name="iJToken">json令牌</param>
         /// <returns>通过返回取出的数据，不通过返回null</returns>
-        private JToken VerifyKeyWord(string keyWord)
+        private JToken VerifyKeyWord(string keyWord, JToken iJToken)
         {
             // 校验
-            var codeToken = _jToken[keyWord];
+            var codeToken = iJToken[keyWord];
             if (codeToken != null) return codeToken;
             Logger.Error("无法找到字段：\"" + keyWord + "\"");
             throw new InvalidKeyWordException("无效的JSON字段！");

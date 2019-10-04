@@ -1,25 +1,28 @@
 ﻿{
     "ProcessName": "MonsterHunterWorld",
     "Signature": "A8 8A CD 42 01 00 00 00 00 00 00 00 00 00 00 00 E0 8D BB 42 01 00",
-    "Archive1": {
-        "firstScanAddress": "9500F648",
-        "lastScanAddress": "a000F648",
-        "interval": "10000",
-        "subtraction": "c68"
+
+    "Archive": {
+        "Archive1": {
+            "firstScanAddress": "9500F648",
+            "lastScanAddress": "a000F648",
+            "interval": "10000",
+            "subtraction": "c68"
+        },
+        "Archive2": {
+            "firstScanAddress": "95009568",
+            "lastScanAddress": "a0009568",
+            "interval": "10000",
+            "subtraction": "c68"
+        },
+        "Archive3": {
+            "firstScanAddress": "95003488",
+            "lastScanAddress": "a0003488",
+            "interval": "10000",
+            "subtraction": "c68"
+        }
     },
-    "Archive2": {
-        "firstScanAddress": "95009568",
-        "lastScanAddress": "a0009568",
-        "interval": "10000",
-        "subtraction": "c68"
-    },
-    "Archive3": {
-        "firstScanAddress": "95003488",
-        "lastScanAddress": "a0003488",
-        "interval": "10000",
-        "subtraction": "c68"
-    },
-    
+
     "Codes": [
         "02d7", "02d8", "02d9", "02db", "02dc", "02dd", "02e7",
         "02e8", "02e9", "02ea", "02eb", "0306", "030b", "0311",
