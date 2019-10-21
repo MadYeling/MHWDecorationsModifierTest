@@ -39,6 +39,8 @@ namespace MHWDecorationsModifier.xaml
                 };
                 _uniformGrid?.Children.Add(userControl1);
             }
+
+            ReadDecorations();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -73,6 +75,11 @@ namespace MHWDecorationsModifier.xaml
 
         private void Refresh_OnClick(object sender, RoutedEventArgs e)
         {
+            ReadDecorations();
+        }
+
+        private void ReadDecorations()
+        {
             var memoryHandler = new MemoryHandler(_archive);
             var list = memoryHandler.GetArchiveDecorations();
 
@@ -80,6 +87,7 @@ namespace MHWDecorationsModifier.xaml
             {
                 var userControl = (UserControl1) _uniformGrid.Children[i];
                 if (userControl == null) continue;
+                if (i >= list.Count) break;
                 userControl.DecorationName = ((DecorationBean) list[i]).Name;
                 userControl.DecorationNumber = ((DecorationBean) list[i]).Number + "";
             }
