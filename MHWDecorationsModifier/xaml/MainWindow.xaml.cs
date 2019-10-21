@@ -12,7 +12,7 @@ namespace MHWDecorationsModifier.xaml
     /// </summary>
     public partial class MainWindow
     {
-        private int _archive;
+        private readonly int _archive;
 
         private UniformGrid _uniformGrid;
 
@@ -26,11 +26,8 @@ namespace MHWDecorationsModifier.xaml
 
         private void Init()
         {
-//            var memoryHandler = new MemoryHandler(_archive);
-//            var list = memoryHandler.GetArchiveDecorations();
-
             _uniformGrid = (UniformGrid) FindName("UniformGrid");
-            
+
             for (var i = 0; i < 50; i++)
             {
                 var userControl1 = new UserControl1
@@ -42,8 +39,6 @@ namespace MHWDecorationsModifier.xaml
                 };
                 _uniformGrid?.Children.Add(userControl1);
             }
-            
-            
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
