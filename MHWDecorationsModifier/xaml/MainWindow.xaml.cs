@@ -137,11 +137,6 @@ namespace MHWDecorationsModifier.xaml
             var list = new ArrayList();
             Logger.Debug("allList.Count:" + allList.Count);
             _maxPage = allList.Count / 50 + 1;
-            if (allList.Count < 50)
-            {
-                RefreshUi(allList);
-                return;
-            }
 
             for (var i = (_nowPage - 1) * 50; i < _nowPage * 50; i++)
             {
@@ -155,8 +150,6 @@ namespace MHWDecorationsModifier.xaml
         /// 刷新UI
         /// </summary>
         /// <param name="list">用于UI显示的珠子列表</param>
-        /// <param name="nowPage">当前页</param>
-        /// <param name="maxPage">最大页</param>
         private void RefreshUi(IList list)
         {
             FrontPage.Visibility = _nowPage == 1 ? Visibility.Hidden : Visibility.Visible;
@@ -166,7 +159,6 @@ namespace MHWDecorationsModifier.xaml
             {
                 var userControl = (UserControl1) UniformGrid.Children[i];
                 if (userControl == null) continue;
-                if (i >= list.Count) break;
                 userControl.DecorationName = ((DecorationBean) list[i]).Name;
                 userControl.DecorationNumber = ((DecorationBean) list[i]).Number + "";
             }

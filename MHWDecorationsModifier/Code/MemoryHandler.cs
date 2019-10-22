@@ -103,21 +103,14 @@ namespace MHWDecorationsModifier.Code
             {
                 var deAddress = address + i * 16;
                 var code = _myOperator.ReadMemory(deAddress, 4);
-                if (code == 0)
-                {
-                    count++;
-                }
-                else
-                {
-                    count = 0;
-                }
+                count = code == 0 ? count + 1 : 0;
 
                 var number = _myOperator.ReadMemory(deAddress + 0x4, 4);
                 var name = code == 0 ? "空" : _jsonHandler.GetNameByCode(code);
 
                 list.Add(new DecorationBean(name, code, number, deAddress));
 
-                if (count > 5)
+                if (count > 10)
                 {
                     break;
                 }
