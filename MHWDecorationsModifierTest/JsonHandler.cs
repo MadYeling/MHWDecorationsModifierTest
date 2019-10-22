@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using MHWDecorationsModifierTest.Beans;
-using MHWDecorationsModifierTest.MyException;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NLog;
+﻿﻿using System;
+ using System.Collections;
+ using System.Collections.Generic;
+ using System.IO;
+ using System.Reflection;
+ using System.Text;
+ using MHWDecorationsModifierTest.Beans;
+ using MHWDecorationsModifierTest.MyException;
+ using Newtonsoft.Json;
+ using Newtonsoft.Json.Linq;
+ using NLog;
 
-namespace MHWDecorationsModifierTest
+ namespace MHWDecorationsModifierTest
 {
-    public class JsonHandler
+public class JsonHandler
     {
         /// <summary>
         /// 日志相关
@@ -34,11 +34,9 @@ namespace MHWDecorationsModifierTest
         /// </summary>
         private readonly Dictionary<int, string> _codeToName;
 
-        public readonly int SignatureLength;
-
-        public const int Archive1 = 0;
-        public const int Archive2 = 1;
-        public const int Archive3 = 2;
+        public const int Archive1 = 1;
+        public const int Archive2 = 2;
+        public const int Archive3 = 3;
 
         /// <summary>
         /// 构造函数，只在这里读取文件
@@ -48,7 +46,6 @@ namespace MHWDecorationsModifierTest
             _jToken = ReadJsonFile();
             // 校验读取结果
             _codeToName = ReadAllName();
-            SignatureLength = ReadSignature().Length;
             if (_jToken != null) return;
             Logger.Error("无法读取JSON文件");
             Environment.Exit(1);
@@ -83,6 +80,7 @@ namespace MHWDecorationsModifierTest
             {
                 const string keyWord = "Signature";
                 var signatureToken = VerifyKeyWord(keyWord, _jToken);
+                Logger.Debug("特征码：" + signatureToken);
                 var signature = signatureToken.ToString().Split(' ');
                 return signature;
             }

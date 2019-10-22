@@ -35,8 +35,6 @@ namespace MHWDecorationsModifier.Code
         /// </summary>
         private readonly Dictionary<int, string> _codeToName;
 
-        public readonly int SignatureLength;
-
         public const int Archive1 = 1;
         public const int Archive2 = 2;
         public const int Archive3 = 3;
@@ -49,7 +47,6 @@ namespace MHWDecorationsModifier.Code
             _jToken = ReadJsonFile();
             // 校验读取结果
             _codeToName = ReadAllName();
-            SignatureLength = ReadSignature().Length;
             if (_jToken != null) return;
             MessageBox.Show("无法读取JSON文件", "警告");
             Logger.Error("无法读取JSON文件");
@@ -85,6 +82,7 @@ namespace MHWDecorationsModifier.Code
             {
                 const string keyWord = "Signature";
                 var signatureToken = VerifyKeyWord(keyWord, _jToken);
+                Logger.Debug("特征码：" + signatureToken);
                 var signature = signatureToken.ToString().Split(' ');
                 return signature;
             }

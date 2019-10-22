@@ -17,6 +17,7 @@ namespace MHWDecorationsModifierTest
         private readonly MemoryOperator _myOperator;
         private readonly JsonHandler _jsonHandler;
         private readonly byte _fistSignatureCode;
+        private readonly string[] _signature;
 
         /// <summary>
         /// 需要特征码中的第几位用来扫描
@@ -29,8 +30,9 @@ namespace MHWDecorationsModifierTest
         {
             _myOperator = new MemoryOperator();
             _jsonHandler = new JsonHandler();
-            _fistSignatureCode = GetFistSignatureCode();
             _archive = archive;
+            _signature = _jsonHandler.ReadSignature();
+            _fistSignatureCode = GetFistSignatureCode();
         }
 
         /// <summary>
@@ -39,8 +41,7 @@ namespace MHWDecorationsModifierTest
         /// <returns>一位特征码</returns>
         private byte GetFistSignatureCode()
         {
-            var signature = _jsonHandler.ReadSignature();
-            return Convert.ToByte(signature[Excursion], 16);
+            return Convert.ToByte(_signature[Excursion], 16);
         }
 
         /// <summary>
@@ -50,12 +51,11 @@ namespace MHWDecorationsModifierTest
         /// <returns>是否相等</returns>
         private bool CompareWithSignature(IEnumerable<byte> scannedSignature)
         {
-            var signature = _jsonHandler.ReadSignature();
-            var signatureBytes = new byte[_jsonHandler.SignatureLength];
+            var signatureBytes = new byte[_signature.Length];
 
-            for (var i = 0; i < _jsonHandler.SignatureLength; i++)
+            for (var i = 0; i < _signature.Length; i++)
             {
-                signatureBytes[i] = Convert.ToByte(signature[i], 16);
+                signatureBytes[i] = Convert.ToByte(_signature[i], 16);
             }
 
             return signatureBytes.SequenceEqual(scannedSignature);
@@ -146,8 +146,8 @@ namespace MHWDecorationsModifierTest
         /// <returns>疑似特征码完整内容</returns>
         private IEnumerable<byte> GetLastBytes(long address)
         {
-            var bytes = new byte[_jsonHandler.SignatureLength];
-            for (var i = 0; i < _jsonHandler.SignatureLength; i++)
+            var bytes = new byte[_signature.Length];
+            for (var i = 0; i < _signature.Length; i++)
             {
                 bytes[i] = (byte) _myOperator.ReadMemory(address + i, 1);
             }

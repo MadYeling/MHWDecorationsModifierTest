@@ -55,7 +55,7 @@ namespace MHWDecorationsModifierTest
 //            var s = new JsonHandler();
 //            Console.WriteLine(s.ReadArchiveBean(JsonHandler.Archive3));
 
-            var q = new MemoryHandler(JsonHandler.Archive2);
+            var q = new MemoryHandler(JsonHandler.Archive1);
             var s = q.GetArchiveDecorations();
 
             for (var i = 0; i < s.Count; i++)
