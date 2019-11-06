@@ -23,7 +23,7 @@ namespace MHWDecorationsModifier.Code
         /// <summary>
         /// 需要特征码中的第几位用来扫描
         /// </summary>
-        private const int Excursion = 0x11;
+        private const int Excursion = 0x12;
 
         private static int _archive;
 
@@ -50,16 +50,16 @@ namespace MHWDecorationsModifier.Code
         /// </summary>
         /// <param name="scannedSignature">内存中读出的特征码</param>
         /// <returns>是否相等</returns>
-        private bool CompareWithSignature(IEnumerable<byte> scannedSignature)
+        private bool CompareWithSignature(IReadOnlyList<byte> scannedSignature)
         {
-            var signatureBytes = new byte[_signature.Length];
-
             for (var i = 0; i < _signature.Length; i++)
             {
-                signatureBytes[i] = Convert.ToByte(_signature[i], 16);
+                if (_signature[i] == "??") continue;
+                var signatureByte = Convert.ToByte(_signature[i], 16);
+                var scannedSignatureByte = scannedSignature[i];
+                if (signatureByte != scannedSignatureByte) return false;
             }
-
-            return signatureBytes.SequenceEqual(scannedSignature);
+            return true;
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace MHWDecorationsModifier.Code
         /// </summary>
         /// <param name="address">地址</param>
         /// <returns>疑似特征码完整内容</returns>
-        private IEnumerable<byte> GetLastBytes(long address)
+        private byte[] GetLastBytes(long address)
         {
             var bytes = new byte[_signature.Length];
             for (var i = 0; i < _signature.Length; i++)
