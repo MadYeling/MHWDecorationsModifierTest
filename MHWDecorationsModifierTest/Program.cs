@@ -16,6 +16,7 @@ namespace MHWDecorationsModifierTest
                 Console.Write("编号：" + (i + 1) + " \t");
                 Console.WriteLine(s[i].ToString());
             }
+
             Console.WriteLine("提示！程序已经更新，可以做到在下方输入珠子名称而不是代码来刷珠子，请输入较为完整的名称且无错别字");
 
             Console.WriteLine("编号：");
@@ -25,11 +26,13 @@ namespace MHWDecorationsModifierTest
             var codeName = Console.ReadLine();
             Console.WriteLine("数量：");
             var nub = Convert.ToInt32(Console.ReadLine());
+            nub = nub < 0 ? 1 : nub;
 
             var code = q.GetCodeByName(codeName);
             if (code == 0)
             {
                 Console.WriteLine("无法找到你需要的珠子");
+                Console.ReadKey();
                 return;
             }
 
