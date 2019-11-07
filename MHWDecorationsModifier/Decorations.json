@@ -5,19 +5,19 @@
     "Archive": {
         "Archive1": {
             "firstScanAddress": "9500F648",
-            "lastScanAddress": "a000F648",
+            "lastScanAddress": "a500F648",
             "interval": "10000",
             "subtraction": "c68"
         },
         "Archive2": {
             "firstScanAddress": "95009568",
-            "lastScanAddress": "a0009568",
+            "lastScanAddress": "a5009568",
             "interval": "10000",
             "subtraction": "c68"
         },
         "Archive3": {
             "firstScanAddress": "95003488",
-            "lastScanAddress": "a0003488",
+            "lastScanAddress": "a5003488",
             "interval": "10000",
             "subtraction": "c68"
         }

@@ -32,7 +32,7 @@ public class JsonHandler
         /// <summary>
         /// 字典
         /// </summary>
-        private readonly Dictionary<int, string> _codeToName;
+        public Dictionary<int, string> CodeName { get; }
 
         public const int Archive1 = 1;
         public const int Archive2 = 2;
@@ -45,7 +45,7 @@ public class JsonHandler
         {
             _jToken = ReadJsonFile();
             // 校验读取结果
-            _codeToName = ReadAllName();
+            CodeName = ReadAllName();
             if (_jToken != null) return;
             Logger.Error("无法读取JSON文件");
             Environment.Exit(1);
@@ -198,16 +198,6 @@ public class JsonHandler
                 Logger.Error(e);
                 return null;
             }
-        }
-
-        /// <summary>
-        /// 通过代码获取名称
-        /// </summary>
-        /// <param name="code">代码</param>
-        /// <returns>名称</returns>
-        public string GetNameByCode(int code)
-        {
-            return _codeToName.ContainsKey(code) ? _codeToName[code] : null;
         }
 
         /// <summary>

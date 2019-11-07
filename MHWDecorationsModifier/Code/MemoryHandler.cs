@@ -19,6 +19,7 @@ namespace MHWDecorationsModifier.Code
         private readonly JsonHandler _jsonHandler;
         private readonly byte _fistSignatureCode;
         private readonly string[] _signature;
+        private readonly Dictionary<int, string> _codeName;
 
         /// <summary>
         /// 需要特征码中的第几位用来扫描
@@ -34,6 +35,7 @@ namespace MHWDecorationsModifier.Code
             _archive = archive;
             _signature = _jsonHandler.ReadSignature();
             _fistSignatureCode = GetFistSignatureCode();
+            _codeName = _jsonHandler.CodeName;
         }
 
         /// <summary>
@@ -59,6 +61,7 @@ namespace MHWDecorationsModifier.Code
                 var scannedSignatureByte = scannedSignature[i];
                 if (signatureByte != scannedSignatureByte) return false;
             }
+
             return true;
         }
 
@@ -106,7 +109,7 @@ namespace MHWDecorationsModifier.Code
                 count = code == 0 ? count + 1 : 0;
 
                 var number = _myOperator.ReadMemory(deAddress + 0x4, 4);
-                var name = code == 0 ? "空" : _jsonHandler.GetNameByCode(code);
+                var name = code == 0 ? "空" : GetNameByCode(code);
 
                 list.Add(new DecorationBean(name, code, number, deAddress));
 
@@ -117,6 +120,26 @@ namespace MHWDecorationsModifier.Code
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// 通过代码获取名称
+        /// </summary>
+        /// <param name="code">代码</param>
+        /// <returns>名称</returns>
+        public string GetNameByCode(int code)
+        {
+            return _codeName.ContainsKey(code) ? _codeName[code] : "未知";
+        }
+
+        public int GetCodeByName(string name)
+        {
+            var code = 0;
+            foreach (var codeName in _codeName.Where(codeName => codeName.Value.Equals(name)))
+            {
+                code = codeName.Key;
+            }
+            return code;
         }
 
         /// <summary>

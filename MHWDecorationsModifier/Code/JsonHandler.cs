@@ -33,7 +33,7 @@ namespace MHWDecorationsModifier.Code
         /// <summary>
         /// 字典
         /// </summary>
-        private readonly Dictionary<int, string> _codeToName;
+        public Dictionary<int, string> CodeName { get; }
 
         public const int Archive1 = 1;
         public const int Archive2 = 2;
@@ -46,7 +46,7 @@ namespace MHWDecorationsModifier.Code
         {
             _jToken = ReadJsonFile();
             // 校验读取结果
-            _codeToName = ReadAllName();
+            CodeName = ReadAllName();
             if (_jToken != null) return;
             MessageBox.Show("无法读取JSON文件", "警告");
             Logger.Error("无法读取JSON文件");
@@ -97,7 +97,7 @@ namespace MHWDecorationsModifier.Code
         /// 读取珠子代码
         /// </summary>
         /// <returns>珠子代码集合</returns>
-        public ArrayList ReadCode()
+        private ArrayList ReadCode()
         {
             var list = new ArrayList();
             try
@@ -201,17 +201,7 @@ namespace MHWDecorationsModifier.Code
                 return null;
             }
         }
-
-        /// <summary>
-        /// 通过代码获取名称
-        /// </summary>
-        /// <param name="code">代码</param>
-        /// <returns>名称</returns>
-        public string GetNameByCode(int code)
-        {
-            return _codeToName.ContainsKey(code) ? _codeToName[code] : null;
-        }
-
+        
         /// <summary>
         /// 校验关键字
         /// </summary>
