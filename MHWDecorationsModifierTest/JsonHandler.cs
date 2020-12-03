@@ -1,18 +1,19 @@
-﻿﻿using System;
- using System.Collections;
- using System.Collections.Generic;
- using System.IO;
- using System.Reflection;
- using System.Text;
- using MHWDecorationsModifierTest.Beans;
- using MHWDecorationsModifierTest.MyException;
- using Newtonsoft.Json;
- using Newtonsoft.Json.Linq;
- using NLog;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using MHWDecorationsModifierTest.Beans;
+using MHWDecorationsModifierTest.MyException;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NLog;
 
- namespace MHWDecorationsModifierTest
+namespace MHWDecorationsModifierTest
 {
-public class JsonHandler
+    public class JsonHandler
     {
         /// <summary>
         /// 日志相关
@@ -32,7 +33,7 @@ public class JsonHandler
         /// <summary>
         /// 字典
         /// </summary>
-        public Dictionary<int, string> CodeName { get; }
+        private readonly Dictionary<int, string> _codeName;
 
         public const int Archive1 = 1;
         public const int Archive2 = 2;
@@ -44,8 +45,8 @@ public class JsonHandler
         public JsonHandler()
         {
             _jToken = ReadJsonFile();
+            _codeName = ReadAllName();
             // 校验读取结果
-            CodeName = ReadAllName();
             if (_jToken != null) return;
             Logger.Error("无法读取JSON文件");
             Environment.Exit(1);
@@ -90,34 +91,31 @@ public class JsonHandler
                 return null;
             }
         }
+        
+        /// <summary>
+        /// 通过代码获取名称
+        /// </summary>
+        /// <param name="code">代码</param>
+        /// <returns>名称</returns>
+        public string GetNameByCode(int code)
+        {
+            return _codeName.ContainsKey(code) ? _codeName[code] : "未知";
+        }
 
         /// <summary>
-        /// 读取珠子代码
+        /// 通过名称获取代码
         /// </summary>
-        /// <returns>珠子代码集合</returns>
-        public ArrayList ReadCode()
+        /// <param name="name">名称</param>
+        /// <returns>代码</returns>
+        public int GetCodeByName(string name)
         {
-            var list = new ArrayList();
-            try
+            var code = 0;
+            foreach (var codeName in _codeName.Where(codeName => codeName.Value.Contains(name)))
             {
-                const string keyWord = "Codes";
-                var codeToken = VerifyKeyWord(keyWord, _jToken);
-
-                // 将读取的内容转换为JSON数组
-                var jArray = JArray.Parse(codeToken.ToString());
-                // 遍历数组，添加进集合
-                foreach (var variable in jArray)
-                {
-                    list.Add(variable);
-                }
-
-                return list;
+                code = codeName.Key;
             }
-            catch (Exception e)
-            {
-                Logger.Error(e);
-                return null;
-            }
+
+            return code;
         }
 
         /// <summary>
@@ -174,19 +172,24 @@ public class JsonHandler
             var map = new Dictionary<int, string>();
             try
             {
-                const string keyWord = "Names";
-                // 获取代码集合
-                var codes = ReadCode();
+                const string keyWord = "Decorations";
                 // 从json中取出需要的那部分内容
                 var name = VerifyKeyWord(keyWord, _jToken);
+                var jObj = JObject.Parse(name.ToString());
+
+                var codes = new List<string>();
+                foreach (var item in jObj)
+                {
+                    codes.Add(item.Key);
+                }
 
                 // 遍历集合
                 foreach (var code in codes)
                 {
                     // 通过遍历取出的代码来获取珠子名称
-                    var decorationName = name[code.ToString()].ToString();
+                    var decorationName = name[code].ToString();
                     // 使用Convert.ToInt32()将字符串类型的16进制转换为数字
-                    var decorationCode = Convert.ToInt32(code.ToString(), 16);
+                    var decorationCode = Convert.ToInt32(code, 16);
                     // 将珠子代码和名称以一一对应的方式添加至字典中，以便日后使用
                     map.Add(decorationCode, decorationName);
                 }

@@ -16,14 +16,20 @@ namespace MHWDecorationsModifierTest
 
         private readonly MemoryOperator _myOperator;
         private readonly JsonHandler _jsonHandler;
-        private readonly byte _fistSignatureCode;
-        private readonly string[] _signature;
-        private readonly Dictionary<int, string> _codeName;
+        /// <summary>
+        /// 配置中特征码的其中一位
+        /// </summary>
+        private readonly byte _oneByteConfigSignature;
+        /// <summary>
+        /// 配置中的特征码字符串数组<br/>
+        /// 因为有"??"的存在，必须使用字符串
+        /// </summary>
+        private readonly string[] _configSignature;
 
         /// <summary>
         /// 需要特征码中的第几位用来扫描
         /// </summary>
-        private const int Excursion = 0x12;
+        private const int Deviation = 18;
 
         private static int _archive;
 
@@ -32,18 +38,37 @@ namespace MHWDecorationsModifierTest
             _myOperator = new MemoryOperator();
             _jsonHandler = new JsonHandler();
             _archive = archive;
-            _signature = _jsonHandler.ReadSignature();
-            _fistSignatureCode = GetFistSignatureCode();
-            _codeName = _jsonHandler.CodeName;
+            _configSignature = _jsonHandler.ReadSignature();
+            _oneByteConfigSignature = GetOneByteConfigSignature();
+        }
+
+        /// <summary>
+        /// 通过代码获取名称
+        /// </summary>
+        /// <param name="code">代码</param>
+        /// <returns>名称</returns>
+        public string GetNameByCode(int code)
+        {
+            return _jsonHandler.GetNameByCode(code);
+        }
+
+        /// <summary>
+        /// 通过名称获取代码
+        /// </summary>
+        /// <param name="name">名称</param>
+        /// <returns>代码</returns>
+        public int GetCodeByName(string name)
+        {
+            return _jsonHandler.GetCodeByName(name);
         }
 
         /// <summary>
         /// 获得特征码中的一位用来扫描
         /// </summary>
         /// <returns>一位特征码</returns>
-        private byte GetFistSignatureCode()
+        private byte GetOneByteConfigSignature()
         {
-            return Convert.ToByte(_signature[Excursion], 16);
+            return Convert.ToByte(_configSignature[Deviation], 16);
         }
 
         /// <summary>
@@ -53,10 +78,10 @@ namespace MHWDecorationsModifierTest
         /// <returns>是否相等</returns>
         private bool CompareWithSignature(IReadOnlyList<byte> scannedSignature)
         {
-            for (var i = 0; i < _signature.Length; i++)
+            for (var i = 0; i < _configSignature.Length; i++)
             {
-                if (_signature[i] == "??") continue;
-                var signatureByte = Convert.ToByte(_signature[i], 16);
+                if (_configSignature[i] == "??") continue;
+                var signatureByte = Convert.ToByte(_configSignature[i], 16);
                 var scannedSignatureByte = scannedSignature[i];
                 if (signatureByte != scannedSignatureByte) return false;
             }
@@ -71,8 +96,8 @@ namespace MHWDecorationsModifierTest
         private long GetDecorationsAddress()
         {
             var archiveBean = _jsonHandler.ReadArchiveBean(_archive);
-            var startScanAddress = archiveBean.FirstScanAddress + Excursion;
-            var lastScanAddress = archiveBean.LastScanAddress + Excursion;
+            var startScanAddress = archiveBean.FirstScanAddress + Deviation;
+            var lastScanAddress = archiveBean.LastScanAddress + Deviation;
             var interval = archiveBean.Interval;
             var subtraction = archiveBean.Subtraction;
 
@@ -80,9 +105,9 @@ namespace MHWDecorationsModifierTest
             for (var i = startScanAddress; i < lastScanAddress; i += interval)
             {
                 var b = _myOperator.ReadMemory(i, 1);
-                if (b != _fistSignatureCode || !CompareWithSignature(GetLastBytes(i - Excursion))) continue;
-                Logger.Debug("寻找到特征码的地址为：" + $"{i - Excursion:x8}");
-                return i - Excursion - subtraction;
+                if (b != _oneByteConfigSignature || !CompareWithSignature(GetLastBytes(i - Deviation))) continue;
+                Logger.Debug("寻找到特征码的地址为：" + $"{i - Deviation:x8}");
+                return i - Deviation - subtraction;
             }
 
             Logger.Error("无法寻找到特征码");
@@ -100,58 +125,22 @@ namespace MHWDecorationsModifierTest
             if (address == 0) return list;
             var count = 0;
 
-            for (var i = 0; i < 120; i++)
+            // 目前一共应该是404个珠子
+            for (var i = 0; i < 410; i++)
             {
                 var deAddress = address + i * 16;
                 var code = _myOperator.ReadMemory(deAddress, 4);
-                if (code == 0)
-                {
-                    count++;
-                }
-                else
-                {
-                    count = 0;
-                }
-
+                count = code == 0 ? count + 1 : 0;
                 var number = _myOperator.ReadMemory(deAddress + 0x4, 4);
-                var name = code == 0 ? "空" : GetNameByCode(code);
-
+                var name = code == 0 ? "空" : _jsonHandler.GetNameByCode(code);
                 list.Add(new DecorationBean(name, code, number, deAddress));
 
-                if (count > 5)
-                {
-                    break;
-                }
+                if (count > 5) break;
             }
 
             return list;
         }
 
-        /// <summary>
-        /// 通过代码获取名称
-        /// </summary>
-        /// <param name="code">代码</param>
-        /// <returns>名称</returns>
-        public string GetNameByCode(int code)
-        {
-            return _codeName.ContainsKey(code) ? _codeName[code] : "未知";
-        }
-
-        /// <summary>
-        /// 通过名称获取代码
-        /// </summary>
-        /// <param name="name">名称</param>
-        /// <returns>代码</returns>
-        public int GetCodeByName(string name)
-        {
-            var code = 0;
-            foreach (var codeName in _codeName.Where(codeName => codeName.Value.Contains(name)))
-            {
-                code = codeName.Key;
-            }
-            return code;
-        }
-        
         /// <summary>
         /// 修改珠子信息
         /// </summary>
@@ -174,8 +163,8 @@ namespace MHWDecorationsModifierTest
         /// <returns>疑似特征码完整内容</returns>
         private byte[] GetLastBytes(long address)
         {
-            var bytes = new byte[_signature.Length];
-            for (var i = 0; i < _signature.Length; i++)
+            var bytes = new byte[_configSignature.Length];
+            for (var i = 0; i < _configSignature.Length; i++)
             {
                 bytes[i] = (byte) _myOperator.ReadMemory(address + i, 1);
             }

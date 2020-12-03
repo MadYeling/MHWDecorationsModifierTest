@@ -9,40 +9,58 @@ namespace MHWDecorationsModifierTest
     {
         public static void Main(string[] args)
         {
-            var q = new MemoryHandler(JsonHandler.Archive1);
-            var s = q.GetArchiveDecorations();
-            for (var i = 0; i < s.Count; i++)
+            new Program().m();
+        }
+
+        private void m()
+        {
+            Console.WriteLine("输入存档号（1或2或3）");
+            var archive = Console.ReadLine();
+            var userArc = Convert.ToInt32(archive);
+            var arc = userArc;
+            if (userArc != JsonHandler.Archive1 && userArc != JsonHandler.Archive2 && userArc != JsonHandler.Archive3)
             {
-                Console.Write("编号：" + (i + 1) + " \t");
-                Console.WriteLine(s[i].ToString());
+                arc = JsonHandler.Archive1;
             }
 
-            Console.WriteLine("提示！程序已经更新，可以做到在下方输入珠子名称而不是代码来刷珠子，请输入较为完整的名称且无错别字");
-
-            Console.WriteLine("编号：");
-            var num = Convert.ToInt32(Console.ReadLine());
-            var address = ((DecorationBean) s[num - 1]).Address;
-            Console.WriteLine("珠子名称：");
-            var codeName = Console.ReadLine();
-            Console.WriteLine("数量：");
-            var nub = Convert.ToInt32(Console.ReadLine());
-            nub = nub < 0 ? 1 : nub;
-
-            var code = q.GetCodeByName(codeName);
-            if (code == 0)
+            while (true)
             {
-                Console.WriteLine("无法找到你需要的珠子");
-                Console.ReadKey();
-                return;
-            }
+                var q = new MemoryHandler(arc);
+                var s = q.GetArchiveDecorations();
+                for (var i = 0; i < s.Count; i++)
+                {
+                    Console.Write("编号：" + (i + 1) + " \t");
+                    Console.WriteLine(s[i].ToString());
+                }
 
-            var name = q.GetNameByCode(code);
-            Console.WriteLine("即将修改的珠子为：【" + name + "】\n是否确定？(Y/N)");
-            var k = Console.Read();
-            if (k != 'Y' && k != 'y') return;
-            var b = new DecorationBean(name, code, nub, address);
-            Console.WriteLine(q.ChangeDecoration(b));
-            Console.ReadKey();
+                Console.WriteLine("提示！如果是4脚双技能珠，请输入完整名称");
+
+                Console.WriteLine("编号：");
+                var num = Convert.ToInt32(Console.ReadLine());
+                var address = ((DecorationBean) s[num - 1]).Address;
+                Console.WriteLine("珠子名称：");
+                var codeName = Console.ReadLine();
+                Console.WriteLine("数量：");
+                var nub = Convert.ToInt32(Console.ReadLine());
+                nub = nub < 0 ? 1 : nub;
+
+                var code = q.GetCodeByName(codeName);
+                if (code == 0)
+                {
+                    Console.WriteLine("无法找到你需要的珠子");
+                    Console.ReadKey();
+                    return;
+                }
+
+                var name = q.GetNameByCode(code);
+                Console.WriteLine("即将修改的珠子为：【" + name + "】\n是否确定？(Y/N)");
+                var k = Console.Read();
+                if (k != 'Y' && k != 'y') return;
+                var b = new DecorationBean(name, code, nub, address);
+                Console.WriteLine(q.ChangeDecoration(b));
+                Console.ReadLine();
+                Console.Clear();
+            }
         }
     }
 }
