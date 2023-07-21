@@ -8,13 +8,17 @@
              mc:Ignorable="d" 
              d:DesignHeight="80" d:DesignWidth="80">
     <Grid>
-
+    
         <Border BorderBrush="#FFE697EA" BorderThickness="1" HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="80"/>
-
-        <Label Content="{Binding DecorationName, RelativeSource={RelativeSource AncestorType={x:Type xaml:UserControl1}, Mode=FindAncestor}}" 
-               Margin="0,10,0,0" VerticalAlignment="Top" FontSize="16" HorizontalAlignment="Center" Width="60" Height="40"/>
-        <Label Content="数量：" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Width="38.666"/>
-        <Label Content="{Binding DecorationNumber, RelativeSource={RelativeSource AncestorType={x:Type xaml:UserControl1}, Mode=FindAncestor}}" HorizontalAlignment="Left" Margin="40,45,-9.263,0" VerticalAlignment="Top" Width="49.263"/>
-
+        <Label Margin="0,2,0,0" VerticalAlignment="Top" FontSize="16" HorizontalAlignment="Center" Width="76" Height="52">
+            <TextBlock TextWrapping="Wrap" Name="DecrorationName"/>
+        </Label>
+        <Label Content="数量：" HorizontalAlignment="Left" Margin="10,53,0,0" VerticalAlignment="Top" Width="39"/>
+        <Label Name="DecrorationNumber" HorizontalAlignment="Left" Margin="40,54,0,0" VerticalAlignment="Top" Width="49"/>
+        <Button Name="FakeButton" Click="ButtonBase_OnClick" OpacityMask="#4C66CCFF" BorderBrush="{x:Null}" Foreground="{x:Null}" Width="80" Margin="-2,0,2,0">
+            <Button.Background>
+                <SolidColorBrush Color="#00000000"/>
+            </Button.Background>
+        </Button>
     </Grid>
 </UserControl>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MHWDecorationsModifier.Beans;
 using System.Text;
+using System.Windows;
 using NLog;
 
 namespace MHWDecorationsModifier.Code
@@ -34,7 +35,7 @@ namespace MHWDecorationsModifier.Code
         /// </summary>
         private const int Deviation = 4;
 
-        private readonly long _decorationAddress = 0;
+        private readonly long _decorationAddress;
 
         private static int _archive;
 
@@ -87,7 +88,6 @@ namespace MHWDecorationsModifier.Code
             var interval = _jsonHandler.ReadInterval();
             var subtraction = _jsonHandler.ReadSubtraction();
 
-            // 因为在扫描的内存地址中数值为A8的过多，为了避免调用过多次方法出错，添加一个偏移量，扫描另一个地址
             for (var i = startScanAddress; i < lastScanAddress; i += interval)
             {
                 var b = _myOperator.ReadMemory(i, 1);
@@ -104,10 +104,10 @@ namespace MHWDecorationsModifier.Code
         /// 获得拥有的珠子集合
         /// </summary>
         /// <returns>珠子集合</returns>
-        public ArrayList GetArchiveDecorations()
+        public List<DecorationBean> GetArchiveDecorations()
         {
             Logger.Debug($"起始地址：{_decorationAddress:X8}, 开始获取珠子列表");
-            var list = new ArrayList();
+            var list = new List<DecorationBean>();
             if (_decorationAddress == 0) return list;
             var count = 0;
 

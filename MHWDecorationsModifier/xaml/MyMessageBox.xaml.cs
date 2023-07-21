@@ -5,7 +5,7 @@ using MHWDecorationsModifier.Code;
 
 namespace MHWDecorationsModifier.xaml
 {
-    public partial class MyMessageBox : Window
+    public partial class MyMessageBox
     {
         private int _archive = 1;
 
@@ -19,12 +19,12 @@ namespace MHWDecorationsModifier.xaml
 
         private void Init()
         {
-            _comboBox = (ComboBox) FindName("ComboBox");
+            _comboBox = (ComboBox)FindName("ComboBox");
             var categoryList = new List<CategoryInfo>
             {
-                new CategoryInfo {Name = "存档1", Value = "archive1"},
-                new CategoryInfo {Name = "存档2", Value = "archive2"},
-                new CategoryInfo {Name = "存档3", Value = "archive3"}
+                new CategoryInfo { Name = "存档1", Value = "archive1" },
+                new CategoryInfo { Name = "存档2", Value = "archive2" },
+                new CategoryInfo { Name = "存档3", Value = "archive3" }
             };
             if (_comboBox == null) return;
             _comboBox.ItemsSource = categoryList;
@@ -42,7 +42,7 @@ namespace MHWDecorationsModifier.xaml
         {
             var messageBox = new MyMessageBox()
             {
-                Title = "提示"
+                Title = "请选择存档"
             };
             messageBox.ShowDialog();
             return messageBox._archive;
@@ -66,9 +66,11 @@ namespace MHWDecorationsModifier.xaml
                     _archive = JsonHandler.Archive1;
                     break;
             }
+
             Close();
         }
     }
+
 
     internal class CategoryInfo
     {

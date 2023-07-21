@@ -45,7 +45,7 @@ namespace MHWDecorationsModifier.Code
         public JsonHandler()
         {
             _jToken = ReadJsonFile();
-            _codeName = ReadAllName();
+            _codeName = ReadAllDecorations();
             // 校验读取结果
             if (_jToken != null) return;
             Logger.Error("无法读取JSON文件");
@@ -156,7 +156,7 @@ namespace MHWDecorationsModifier.Code
         /// <returns>名称</returns>
         public string GetNameByCode(int code)
         {
-            return _codeName.ContainsKey(code) ? _codeName[code] : "未知";
+            return _codeName.TryGetValue(code, out var value) ? value : "未知";
         }
 
         /// <summary>
@@ -206,8 +206,8 @@ namespace MHWDecorationsModifier.Code
 
                 var archiveToken = VerifyKeyWord(keyWord, acToken);
 
-                var firstScanAddress = Convert.ToInt64(archiveToken["firstScanAddress"].ToString(), 16);
-                var lastScanAddress = Convert.ToInt64(archiveToken["lastScanAddress"].ToString(), 16);
+                var firstScanAddress = Convert.ToInt64(archiveToken["firstScanAddress"]?.ToString(), 16);
+                var lastScanAddress = Convert.ToInt64(archiveToken["lastScanAddress"]?.ToString(), 16);
 
                 return new ArchiveBean(firstScanAddress, lastScanAddress);
             }
@@ -222,7 +222,7 @@ namespace MHWDecorationsModifier.Code
         /// 读取字典
         /// </summary>
         /// <returns>代码名称对照字典</returns>
-        private Dictionary<int, string> ReadAllName()
+        public Dictionary<int, string> ReadAllDecorations()
         {
             var map = new Dictionary<int, string>();
             try
@@ -242,7 +242,7 @@ namespace MHWDecorationsModifier.Code
                 foreach (var code in codes)
                 {
                     // 通过遍历取出的代码来获取珠子名称
-                    var decorationName = name[code].ToString();
+                    var decorationName = name[code]?.ToString();
                     // 使用Convert.ToInt32()将字符串类型的16进制转换为数字
                     var decorationCode = Convert.ToInt32(code, 16);
                     // 将珠子代码和名称以一一对应的方式添加至字典中，以便日后使用
@@ -264,7 +264,7 @@ namespace MHWDecorationsModifier.Code
         /// <param name="keyWord">关键字</param>
         /// <param name="iJToken">json令牌</param>
         /// <returns>通过返回取出的数据，不通过返回null</returns>
-        private JToken VerifyKeyWord(string keyWord, JToken iJToken)
+        private static JToken VerifyKeyWord(string keyWord, JToken iJToken)
         {
             // 校验
             var codeToken = iJToken[keyWord];

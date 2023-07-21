@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
+using System.Windows;
 using NLog;
 
 namespace MHWDecorationsModifier.Code
@@ -44,8 +45,8 @@ namespace MHWDecorationsModifier.Code
             if (_pid == 0)
             {
                 Logger.Error("无法获取进程PID");
-                Console.ReadKey();
-                Environment.Exit(1);
+                MessageBox.Show("游戏未在运行，程序即将退出", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(0);
             }
             else
             {
@@ -53,7 +54,7 @@ namespace MHWDecorationsModifier.Code
             }
         }
 
-        private int GetPidByName(string processName)
+        private static int GetPidByName(string processName)
         {
             var processes = Process.GetProcessesByName(processName);
             return (from process in processes where process.ProcessName == processName select process.Id)

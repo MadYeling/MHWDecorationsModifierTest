@@ -1,7 +1,9 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Documents;
 using MHWDecorationsModifier.Beans;
 using MHWDecorationsModifier.Code;
 using NLog;
@@ -24,7 +26,7 @@ namespace MHWDecorationsModifier.xaml
 
         private int _maxPage = 1;
 
-        private ArrayList _allDecorations;
+        private List<DecorationBean> _allDecorations;
 
         private MemoryHandler _memoryHandler;
 
@@ -43,24 +45,21 @@ namespace MHWDecorationsModifier.xaml
         /// </summary>
         private void Init()
         {
+            _memoryHandler = new MemoryHandler(_archive);
+            Title = $"玩家名称: {_memoryHandler.GetPlayerName()}";
+
             // 向UniformGrid中添加自定义控件
             for (var i = 0; i < 50; i++)
             {
-                var userControl1 = new UserControl1
+                var userControl1 = new UserControl1(this, _memoryHandler)
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    DecorationName = "空",
-                    DecorationNumber = "0"
                 };
                 UniformGrid.Children.Add(userControl1);
             }
 
-            // 扫描内存，获取珠子
-            _memoryHandler = new MemoryHandler(_archive);
-            _allDecorations = _memoryHandler.GetArchiveDecorations();
-            Title =$"玩家名称: {_memoryHandler.GetPlayerName()}" ;
-            RefreshUi();
+            ForceRefreshUi();
         }
 
         /// <summary>
@@ -68,9 +67,10 @@ namespace MHWDecorationsModifier.xaml
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Window_Closing(object sender, CancelEventArgs e)
+        private static void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (MessageBox.Show("是否退出应用程序？", "提示", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show("是否退出应用？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
+                MessageBoxResult.Yes)
             {
                 e.Cancel = false;
                 // 关闭应用
@@ -123,8 +123,7 @@ namespace MHWDecorationsModifier.xaml
         /// <param name="e"></param>
         private void Refresh_OnClick(object sender, RoutedEventArgs e)
         {
-            _allDecorations = _memoryHandler.GetArchiveDecorations();
-            RefreshUi();
+            ForceRefreshUi();
         }
 
         private void FrontPage_OnClick(object sender, RoutedEventArgs e)
@@ -142,10 +141,9 @@ namespace MHWDecorationsModifier.xaml
         /// <summary>
         /// 刷新UI
         /// </summary>
-        /// <param name="list">用于UI显示的珠子列表</param>
         private void RefreshUi()
         {
-            var list = new ArrayList();
+            var list = new List<DecorationBean>();
             _maxPage = _allDecorations.Count / 50 + 1;
 
             FrontPage.Visibility = _nowPage == 1 ? Visibility.Hidden : Visibility.Visible;
@@ -153,16 +151,21 @@ namespace MHWDecorationsModifier.xaml
 
             for (var i = (_nowPage - 1) * 50; i < _nowPage * 50; i++)
             {
-                list.Add(i >= _allDecorations.Count ? new DecorationBean("锁定", 0, 0, 0) : _allDecorations[i]);
+                list.Add(i >= _allDecorations.Count ? new DecorationBean("锁定", 0, 0, -1) : _allDecorations[i]);
             }
 
             for (var i = 0; i < 50; i++)
             {
                 var userControl = (UserControl1)UniformGrid.Children[i];
-                if (userControl == null) continue;
-                userControl.DecorationName = ((DecorationBean)list[i]).Name;
-                userControl.DecorationNumber = ((DecorationBean)list[i]).Number + "";
+                userControl?.SetDecoration(list[i]);
             }
+        }
+
+        public void ForceRefreshUi()
+        {
+            Logger.Debug("强制刷新UI");
+            _allDecorations = _memoryHandler.GetArchiveDecorations();
+            RefreshUi();
         }
     }
 }
