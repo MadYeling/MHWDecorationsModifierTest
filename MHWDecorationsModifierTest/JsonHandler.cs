@@ -91,7 +91,64 @@ namespace MHWDecorationsModifierTest
                 return null;
             }
         }
-        
+
+        /// <summary>
+        /// 读取扫描间隔
+        /// </summary>
+        /// <returns>扫描间隔</returns>
+        public int ReadInterval()
+        {
+            try
+            {
+                const string keyWord = "interval";
+                var token = VerifyKeyWord(keyWord, _jToken);
+                return Convert.ToInt32(token.ToString(), 16);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return 0x10000;
+            }
+        }
+
+        /// <summary>
+        /// 读取珠子首位差
+        /// </summary>
+        /// <returns>首位差</returns>
+        public int ReadSubtraction()
+        {
+            try
+            {
+                const string keyWord = "subtraction";
+                var token = VerifyKeyWord(keyWord, _jToken);
+                return Convert.ToInt32(token.ToString(), 16);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return 0x1F38;
+            }
+        }
+
+        /// <summary>
+        /// 读取名字首位差
+        /// </summary>
+        /// <returns>首位差</returns>
+        public int ReadNameSub()
+        {
+            try
+            {
+                const string keyWord = "name";
+                var token = VerifyKeyWord(keyWord, _jToken);
+                return Convert.ToInt32(token.ToString(), 16);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return 0x10000;
+            }
+        }
+
         /// <summary>
         /// 通过代码获取名称
         /// </summary>
@@ -151,10 +208,8 @@ namespace MHWDecorationsModifierTest
 
                 var firstScanAddress = Convert.ToInt64(archiveToken["firstScanAddress"].ToString(), 16);
                 var lastScanAddress = Convert.ToInt64(archiveToken["lastScanAddress"].ToString(), 16);
-                var interval = Convert.ToInt32(archiveToken["interval"].ToString(), 16);
-                var subtraction = Convert.ToInt32(archiveToken["subtraction"].ToString(), 16);
 
-                return new ArchiveBean(firstScanAddress, lastScanAddress, interval, subtraction);
+                return new ArchiveBean(firstScanAddress, lastScanAddress);
             }
             catch (Exception e)
             {
@@ -230,10 +285,6 @@ namespace MHWDecorationsModifierTest
                 var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase)
                                ?.Replace("file:\\", "") + "\\" + FileName;
                 JToken jToken;
-                /*
-                 某些类型的非托管对象有数量限制或很耗费系统资源，在代码使用完它们后，尽可能快的释放它们时非常重要的。
-                 using语句有助于简化该过程并确保这些资源被适当的处置（dispose）。
-                 */
                 using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     using (var reader = new StreamReader(stream, Encoding.UTF8))

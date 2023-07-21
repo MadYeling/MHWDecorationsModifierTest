@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Windows;
 using MHWDecorationsModifier.Beans;
 using MHWDecorationsModifier.MyException;
 using Newtonsoft.Json;
@@ -33,7 +33,7 @@ namespace MHWDecorationsModifier.Code
         /// <summary>
         /// 字典
         /// </summary>
-        public Dictionary<int, string> CodeName { get; }
+        private readonly Dictionary<int, string> _codeName;
 
         public const int Archive1 = 1;
         public const int Archive2 = 2;
@@ -45,10 +45,9 @@ namespace MHWDecorationsModifier.Code
         public JsonHandler()
         {
             _jToken = ReadJsonFile();
+            _codeName = ReadAllName();
             // 校验读取结果
-            CodeName = ReadAllName();
             if (_jToken != null) return;
-            MessageBox.Show("无法读取JSON文件", "警告");
             Logger.Error("无法读取JSON文件");
             Environment.Exit(1);
         }
@@ -94,32 +93,86 @@ namespace MHWDecorationsModifier.Code
         }
 
         /// <summary>
-        /// 读取珠子代码
+        /// 读取扫描间隔
         /// </summary>
-        /// <returns>珠子代码集合</returns>
-        private ArrayList ReadCode()
+        /// <returns>扫描间隔</returns>
+        public int ReadInterval()
         {
-            var list = new ArrayList();
             try
             {
-                const string keyWord = "Codes";
-                var codeToken = VerifyKeyWord(keyWord, _jToken);
-
-                // 将读取的内容转换为JSON数组
-                var jArray = JArray.Parse(codeToken.ToString());
-                // 遍历数组，添加进集合
-                foreach (var variable in jArray)
-                {
-                    list.Add(variable);
-                }
-
-                return list;
+                const string keyWord = "interval";
+                var token = VerifyKeyWord(keyWord, _jToken);
+                return Convert.ToInt32(token.ToString(), 16);
             }
             catch (Exception e)
             {
                 Logger.Error(e);
-                return null;
+                return 0x10000;
             }
+        }
+
+        /// <summary>
+        /// 读取珠子首位差
+        /// </summary>
+        /// <returns>首位差</returns>
+        public int ReadSubtraction()
+        {
+            try
+            {
+                const string keyWord = "subtraction";
+                var token = VerifyKeyWord(keyWord, _jToken);
+                return Convert.ToInt32(token.ToString(), 16);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return 0x1F38;
+            }
+        }
+
+        /// <summary>
+        /// 读取名字首位差
+        /// </summary>
+        /// <returns>首位差</returns>
+        public int ReadNameSub()
+        {
+            try
+            {
+                const string keyWord = "name";
+                var token = VerifyKeyWord(keyWord, _jToken);
+                return Convert.ToInt32(token.ToString(), 16);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return 0x10000;
+            }
+        }
+
+        /// <summary>
+        /// 通过代码获取名称
+        /// </summary>
+        /// <param name="code">代码</param>
+        /// <returns>名称</returns>
+        public string GetNameByCode(int code)
+        {
+            return _codeName.ContainsKey(code) ? _codeName[code] : "未知";
+        }
+
+        /// <summary>
+        /// 通过名称获取代码
+        /// </summary>
+        /// <param name="name">名称</param>
+        /// <returns>代码</returns>
+        public int GetCodeByName(string name)
+        {
+            var code = 0;
+            foreach (var codeName in _codeName.Where(codeName => codeName.Value.Contains(name)))
+            {
+                code = codeName.Key;
+            }
+
+            return code;
         }
 
         /// <summary>
@@ -155,10 +208,8 @@ namespace MHWDecorationsModifier.Code
 
                 var firstScanAddress = Convert.ToInt64(archiveToken["firstScanAddress"].ToString(), 16);
                 var lastScanAddress = Convert.ToInt64(archiveToken["lastScanAddress"].ToString(), 16);
-                var interval = Convert.ToInt32(archiveToken["interval"].ToString(), 16);
-                var subtraction = Convert.ToInt32(archiveToken["subtraction"].ToString(), 16);
 
-                return new ArchiveBean(firstScanAddress, lastScanAddress, interval, subtraction);
+                return new ArchiveBean(firstScanAddress, lastScanAddress);
             }
             catch (Exception e)
             {
@@ -176,19 +227,24 @@ namespace MHWDecorationsModifier.Code
             var map = new Dictionary<int, string>();
             try
             {
-                const string keyWord = "Names";
-                // 获取代码集合
-                var codes = ReadCode();
+                const string keyWord = "Decorations";
                 // 从json中取出需要的那部分内容
                 var name = VerifyKeyWord(keyWord, _jToken);
+                var jObj = JObject.Parse(name.ToString());
+
+                var codes = new List<string>();
+                foreach (var item in jObj)
+                {
+                    codes.Add(item.Key);
+                }
 
                 // 遍历集合
                 foreach (var code in codes)
                 {
                     // 通过遍历取出的代码来获取珠子名称
-                    var decorationName = name[code.ToString()].ToString();
+                    var decorationName = name[code].ToString();
                     // 使用Convert.ToInt32()将字符串类型的16进制转换为数字
-                    var decorationCode = Convert.ToInt32(code.ToString(), 16);
+                    var decorationCode = Convert.ToInt32(code, 16);
                     // 将珠子代码和名称以一一对应的方式添加至字典中，以便日后使用
                     map.Add(decorationCode, decorationName);
                 }
@@ -201,7 +257,7 @@ namespace MHWDecorationsModifier.Code
                 return null;
             }
         }
-        
+
         /// <summary>
         /// 校验关键字
         /// </summary>
@@ -214,7 +270,6 @@ namespace MHWDecorationsModifier.Code
             var codeToken = iJToken[keyWord];
             if (codeToken != null) return codeToken;
             Logger.Error("无法找到字段：\"" + keyWord + "\"");
-            MessageBox.Show("无法找到字段：\"" + keyWord + "\"，请检查json文件", "警告");
             throw new InvalidKeyWordException("无效的JSON字段！");
         }
 
@@ -230,10 +285,6 @@ namespace MHWDecorationsModifier.Code
                 var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase)
                                ?.Replace("file:\\", "") + "\\" + FileName;
                 JToken jToken;
-                /*
-                 某些类型的非托管对象有数量限制或很耗费系统资源，在代码使用完它们后，尽可能快的释放它们时非常重要的。
-                 using语句有助于简化该过程并确保这些资源被适当的处置（dispose）。
-                 */
                 using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     using (var reader = new StreamReader(stream, Encoding.UTF8))

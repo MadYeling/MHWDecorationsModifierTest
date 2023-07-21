@@ -29,7 +29,7 @@ namespace MHWDecorationsModifierTest
         /// <summary>
         /// 需要特征码中的第几位用来扫描
         /// </summary>
-        private const int Deviation = 18;
+        private const int Deviation = 4;
 
         private static int _archive;
 
@@ -98,18 +98,17 @@ namespace MHWDecorationsModifierTest
             var archiveBean = _jsonHandler.ReadArchiveBean(_archive);
             var startScanAddress = archiveBean.FirstScanAddress + Deviation;
             var lastScanAddress = archiveBean.LastScanAddress + Deviation;
-            var interval = archiveBean.Interval;
-            var subtraction = archiveBean.Subtraction;
+            var interval = _jsonHandler.ReadInterval();
+            var subtraction = _jsonHandler.ReadSubtraction();
 
             // 因为在扫描的内存地址中数值为A8的过多，为了避免调用过多次方法出错，添加一个偏移量，扫描另一个地址
             for (var i = startScanAddress; i < lastScanAddress; i += interval)
             {
                 var b = _myOperator.ReadMemory(i, 1);
                 if (b != _oneByteConfigSignature || !CompareWithSignature(GetLastBytes(i - Deviation))) continue;
-                Logger.Debug("寻找到特征码的地址为：" + $"{i - Deviation:x8}");
+                Logger.Debug("寻找到特征码的地址为：" + $"{i - Deviation:X8}");
                 return i - Deviation - subtraction;
             }
-
             Logger.Error("无法寻找到特征码");
             return 0;
         }
@@ -122,6 +121,9 @@ namespace MHWDecorationsModifierTest
         {
             var list = new ArrayList();
             var address = GetDecorationsAddress();
+            var nameAddress = GetDecorationsAddress() - _jsonHandler.ReadNameSub();
+            var playerName = _myOperator.ReadPlayerName(nameAddress);
+            Logger.Debug($"存档玩家名称：{playerName}");
             if (address == 0) return list;
             var count = 0;
 
@@ -166,7 +168,7 @@ namespace MHWDecorationsModifierTest
             var bytes = new byte[_configSignature.Length];
             for (var i = 0; i < _configSignature.Length; i++)
             {
-                bytes[i] = (byte) _myOperator.ReadMemory(address + i, 1);
+                bytes[i] = (byte)_myOperator.ReadMemory(address + i, 1);
             }
 
             return bytes;

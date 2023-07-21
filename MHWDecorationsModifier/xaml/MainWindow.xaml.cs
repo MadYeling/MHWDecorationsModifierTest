@@ -24,6 +24,10 @@ namespace MHWDecorationsModifier.xaml
 
         private int _maxPage = 1;
 
+        private ArrayList _allDecorations;
+
+        private MemoryHandler _memoryHandler;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -53,7 +57,10 @@ namespace MHWDecorationsModifier.xaml
             }
 
             // 扫描内存，获取珠子
-            DecorationListDisposer();
+            _memoryHandler = new MemoryHandler(_archive);
+            _allDecorations = _memoryHandler.GetArchiveDecorations();
+            Title =$"玩家名称: {_memoryHandler.GetPlayerName()}" ;
+            RefreshUi();
         }
 
         /// <summary>
@@ -93,7 +100,7 @@ namespace MHWDecorationsModifier.xaml
         /// <param name="e"></param>
         private void Teach_OnClick(object sender, RoutedEventArgs e)
         {
-            var proc = new Process {StartInfo = {FileName = "https://www.bilibili.com/video/av70022048"}};
+            var proc = new Process { StartInfo = { FileName = "https://www.bilibili.com/video/av70022048" } };
             proc.Start();
         }
 
@@ -104,7 +111,8 @@ namespace MHWDecorationsModifier.xaml
         /// <param name="e"></param>
         private void About_OnClick(object sender, RoutedEventArgs e)
         {
-            var proc = new Process {StartInfo = {FileName = "https://github.com/MadYeling/MHWDecorationsModifierTest"}};
+            var proc = new Process
+                { StartInfo = { FileName = "https://github.com/MadYeling/MHWDecorationsModifierTest" } };
             proc.Start();
         }
 
@@ -115,52 +123,45 @@ namespace MHWDecorationsModifier.xaml
         /// <param name="e"></param>
         private void Refresh_OnClick(object sender, RoutedEventArgs e)
         {
-            DecorationListDisposer();
+            _allDecorations = _memoryHandler.GetArchiveDecorations();
+            RefreshUi();
         }
 
         private void FrontPage_OnClick(object sender, RoutedEventArgs e)
         {
             _nowPage--;
-            DecorationListDisposer();
+            RefreshUi();
         }
 
         private void NextPage_OnClick(object sender, RoutedEventArgs e)
         {
             _nowPage++;
-            DecorationListDisposer();
-        }
-
-        private void DecorationListDisposer()
-        {
-            var memoryHandler = new MemoryHandler(_archive);
-            var allList = memoryHandler.GetArchiveDecorations();
-            var list = new ArrayList();
-            Logger.Debug("allList.Count:" + allList.Count);
-            _maxPage = allList.Count / 50 + 1;
-
-            for (var i = (_nowPage - 1) * 50; i < _nowPage * 50; i++)
-            {
-                list.Add(i >= allList.Count ? new DecorationBean("锁定", 0, 0, 0) : allList[i]);
-            }
-
-            RefreshUi(list);
+            RefreshUi();
         }
 
         /// <summary>
         /// 刷新UI
         /// </summary>
         /// <param name="list">用于UI显示的珠子列表</param>
-        private void RefreshUi(IList list)
+        private void RefreshUi()
         {
+            var list = new ArrayList();
+            _maxPage = _allDecorations.Count / 50 + 1;
+
             FrontPage.Visibility = _nowPage == 1 ? Visibility.Hidden : Visibility.Visible;
             NextPage.Visibility = _nowPage == _maxPage ? Visibility.Hidden : Visibility.Visible;
 
+            for (var i = (_nowPage - 1) * 50; i < _nowPage * 50; i++)
+            {
+                list.Add(i >= _allDecorations.Count ? new DecorationBean("锁定", 0, 0, 0) : _allDecorations[i]);
+            }
+
             for (var i = 0; i < 50; i++)
             {
-                var userControl = (UserControl1) UniformGrid.Children[i];
+                var userControl = (UserControl1)UniformGrid.Children[i];
                 if (userControl == null) continue;
-                userControl.DecorationName = ((DecorationBean) list[i]).Name;
-                userControl.DecorationNumber = ((DecorationBean) list[i]).Number + "";
+                userControl.DecorationName = ((DecorationBean)list[i]).Name;
+                userControl.DecorationNumber = ((DecorationBean)list[i]).Number + "";
             }
         }
     }

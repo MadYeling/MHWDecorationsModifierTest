@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using NLog;
 
 namespace MHWDecorationsModifierTest
@@ -17,8 +18,7 @@ namespace MHWDecorationsModifierTest
 
         //从指定内存中读取字节集数据
         [DllImport("kernel32.dll", EntryPoint = "ReadProcessMemory")]
-        private static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, int nSize,
-            IntPtr lpNumberOfBytesRead);
+        private static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, int nSize, IntPtr lpNumberOfBytesRead);
 
         //从指定内存中写入字节集数据
         [DllImportAttribute("kernel32.dll", EntryPoint = "WriteProcessMemory")]
@@ -45,6 +45,7 @@ namespace MHWDecorationsModifierTest
             if (_pid == 0)
             {
                 Logger.Error("无法获取进程PID");
+                Console.ReadKey();
                 Environment.Exit(1);
             }
             else
@@ -74,7 +75,7 @@ namespace MHWDecorationsModifierTest
                 //打开一个已存在的进程对象  0x1F0FFF 最高权限
                 var hProcess = OpenProcess(0x1F0FFF, false, _pid);
                 //从指定内存中写入字节集数据
-                WriteProcessMemory(hProcess, (IntPtr) address, new[] {number}, 4, IntPtr.Zero);
+                WriteProcessMemory(hProcess, (IntPtr)address, new[] { number }, 4, IntPtr.Zero);
                 //关闭操作
                 CloseHandle(hProcess);
                 return true;
@@ -107,13 +108,14 @@ namespace MHWDecorationsModifierTest
                 var buffer = new byte[byteLength];
                 //获取缓冲区地址
                 var byteAddress = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
-                //打开一个已存在的进程对象  0x1F0FFF 最高权限
+                Logger.Debug($"扫描进度：{address:X8}");
+                ////打开一个已存在的进程对象  0x1F0FFF 最高权限
                 var hProcess = OpenProcess(0x1F0FFF, false, _pid);
-                //将制定内存中的值读入缓冲区
-                ReadProcessMemory(hProcess, (IntPtr) address, byteAddress, byteLength, IntPtr.Zero);
-                //关闭操作
+                ////将制定内存中的值读入缓冲区
+                ReadProcessMemory(hProcess, new IntPtr(address), byteAddress, byteLength, IntPtr.Zero);
+                ////关闭操作
                 CloseHandle(hProcess);
-                //从非托管内存中读取一个 32 位带符号整数。
+                ////从非托管内存中读取一个 32 位带符号整数。
                 var nub = Marshal.ReadInt32(byteAddress);
                 return nub;
             }
@@ -129,6 +131,23 @@ namespace MHWDecorationsModifierTest
                 Logger.Error(e.ToString());
                 return 0;
             }
+        }
+
+        /// <summary>
+        /// 访问玩家名称
+        /// </summary>
+        /// <param name="address">内存地址</param>
+        /// <returns>玩家名称</returns>
+        [HandleProcessCorruptedStateExceptions]
+        public string ReadPlayerName(long address)
+        {
+            int byteLength = 64;
+            var nameByte = new byte[byteLength];
+            for (int i = 0; i < byteLength; i++)
+            {
+                nameByte[i] = Convert.ToByte(ReadMemory(address + i, 1));
+            }
+            return Encoding.UTF8.GetString(nameByte);
         }
     }
 }

@@ -1,26 +1,23 @@
 ﻿{
-    "ProcessName": "MonsterHunterWorld",
-    "Signature": "80 2D 10 43 01 00 00 00 00 00 00 00 16 01 00 00 48 3C F6 42 01 00 00 00 00",
-    "Archive": {
-        "Archive1": {
-            "firstScanAddress": "150010e8",
-            "lastScanAddress": "F50010e8",
-            "interval": "10000",
-            "subtraction": "1F38"
-        },
-        "Archive2": {
-            "firstScanAddress": "1500FAD8",
-            "lastScanAddress": "F500FAD8",
-            "interval": "10000",
-            "subtraction": "1F38"
-        },
-        "Archive3": {
-            "firstScanAddress": "1500E4C8",
-            "lastScanAddress": "F500E4C8",
-            "interval": "10000",
-            "subtraction": "1F38"
-        }
+  "ProcessName": "MonsterHunterWorld",
+  "Signature": "A0 B2 10 43 01 00 00 00 00 00 00 00 ?? ?? 00 00 48 AD F6 42 01 00 00 00",
+  "interval": "10000",
+  "subtraction": "1F38",
+  "name": "3F0E0",
+  "Archive": {
+    "Archive1": {
+      "firstScanAddress": "150010E8",
+      "lastScanAddress": "F50010E8"
     },
+    "Archive2": {
+      "firstScanAddress": "1500FAD8",
+      "lastScanAddress": "F500FAD8"
+    },
+    "Archive3": {
+      "firstScanAddress": "1500E4C8",
+      "lastScanAddress": "F500E4C8"
+    }
+  },
   "Decorations": {
     "02d7": "耐毒珠",
     "02d8": "耐麻珠",

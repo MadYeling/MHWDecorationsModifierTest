@@ -12,7 +12,7 @@
         <Border BorderBrush="#FFE697EA" BorderThickness="1" HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="80"/>
 
         <Label Content="{Binding DecorationName, RelativeSource={RelativeSource AncestorType={x:Type xaml:UserControl1}, Mode=FindAncestor}}" 
-               Margin="10,10,0,0" VerticalAlignment="Top" FontSize="16" HorizontalAlignment="Left" Width="60"/>
+               Margin="0,10,0,0" VerticalAlignment="Top" FontSize="16" HorizontalAlignment="Center" Width="60" Height="40"/>
         <Label Content="数量：" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top" Width="38.666"/>
         <Label Content="{Binding DecorationNumber, RelativeSource={RelativeSource AncestorType={x:Type xaml:UserControl1}, Mode=FindAncestor}}" HorizontalAlignment="Left" Margin="40,45,-9.263,0" VerticalAlignment="Top" Width="49.263"/>
 

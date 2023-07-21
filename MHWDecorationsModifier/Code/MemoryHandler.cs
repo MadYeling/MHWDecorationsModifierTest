@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using MHWDecorationsModifier.Beans;
+using System.Text;
 using NLog;
 
 namespace MHWDecorationsModifier.Code
@@ -17,14 +17,24 @@ namespace MHWDecorationsModifier.Code
 
         private readonly MemoryOperator _myOperator;
         private readonly JsonHandler _jsonHandler;
-        private readonly byte _fistSignatureCode;
-        private readonly string[] _signature;
-        private readonly Dictionary<int, string> _codeName;
+
+        /// <summary>
+        /// 配置中特征码的其中一位
+        /// </summary>
+        private readonly byte _oneByteConfigSignature;
+
+        /// <summary>
+        /// 配置中的特征码字符串数组<br/>
+        /// 因为有"??"的存在，必须使用字符串
+        /// </summary>
+        private readonly string[] _configSignature;
 
         /// <summary>
         /// 需要特征码中的第几位用来扫描
         /// </summary>
-        private const int Excursion = 0x12;
+        private const int Deviation = 4;
+
+        private readonly long _decorationAddress = 0;
 
         private static int _archive;
 
@@ -33,18 +43,18 @@ namespace MHWDecorationsModifier.Code
             _myOperator = new MemoryOperator();
             _jsonHandler = new JsonHandler();
             _archive = archive;
-            _signature = _jsonHandler.ReadSignature();
-            _fistSignatureCode = GetFistSignatureCode();
-            _codeName = _jsonHandler.CodeName;
+            _configSignature = _jsonHandler.ReadSignature();
+            _oneByteConfigSignature = GetOneByteConfigSignature();
+            _decorationAddress = GetDecorationsAddress();
         }
 
         /// <summary>
         /// 获得特征码中的一位用来扫描
         /// </summary>
         /// <returns>一位特征码</returns>
-        private byte GetFistSignatureCode()
+        private byte GetOneByteConfigSignature()
         {
-            return Convert.ToByte(_signature[Excursion], 16);
+            return Convert.ToByte(_configSignature[Deviation], 16);
         }
 
         /// <summary>
@@ -54,10 +64,10 @@ namespace MHWDecorationsModifier.Code
         /// <returns>是否相等</returns>
         private bool CompareWithSignature(IReadOnlyList<byte> scannedSignature)
         {
-            for (var i = 0; i < _signature.Length; i++)
+            for (var i = 0; i < _configSignature.Length; i++)
             {
-                if (_signature[i] == "??") continue;
-                var signatureByte = Convert.ToByte(_signature[i], 16);
+                if (_configSignature[i] == "??") continue;
+                var signatureByte = Convert.ToByte(_configSignature[i], 16);
                 var scannedSignatureByte = scannedSignature[i];
                 if (signatureByte != scannedSignatureByte) return false;
             }
@@ -72,22 +82,21 @@ namespace MHWDecorationsModifier.Code
         private long GetDecorationsAddress()
         {
             var archiveBean = _jsonHandler.ReadArchiveBean(_archive);
-            var startScanAddress = archiveBean.FirstScanAddress + Excursion;
-            var lastScanAddress = archiveBean.LastScanAddress + Excursion;
-            var interval = archiveBean.Interval;
-            var subtraction = archiveBean.Subtraction;
+            var startScanAddress = archiveBean.FirstScanAddress + Deviation;
+            var lastScanAddress = archiveBean.LastScanAddress + Deviation;
+            var interval = _jsonHandler.ReadInterval();
+            var subtraction = _jsonHandler.ReadSubtraction();
 
             // 因为在扫描的内存地址中数值为A8的过多，为了避免调用过多次方法出错，添加一个偏移量，扫描另一个地址
             for (var i = startScanAddress; i < lastScanAddress; i += interval)
             {
                 var b = _myOperator.ReadMemory(i, 1);
-                if (b != _fistSignatureCode || !CompareWithSignature(GetLastBytes(i - Excursion))) continue;
-                Logger.Debug("寻找到特征码的地址为：" + $"{i - Excursion:x8}");
-                return i - Excursion - subtraction;
+                if (b != _oneByteConfigSignature || !CompareWithSignature(GetLastBytes(i - Deviation))) continue;
+                Logger.Debug("寻找到特征码的地址为：" + $"{i - Deviation:X8}");
+                return i - Deviation - subtraction;
             }
 
             Logger.Error("无法寻找到特征码");
-            MessageBox.Show("无法寻找到特征码，请联系作者", "警告");
             return 0;
         }
 
@@ -97,49 +106,42 @@ namespace MHWDecorationsModifier.Code
         /// <returns>珠子集合</returns>
         public ArrayList GetArchiveDecorations()
         {
+            Logger.Debug($"起始地址：{_decorationAddress:X8}, 开始获取珠子列表");
             var list = new ArrayList();
-            var address = GetDecorationsAddress();
-            if (address == 0) return list;
+            if (_decorationAddress == 0) return list;
             var count = 0;
 
-            for (var i = 0; i < 120; i++)
+            // 目前一共应该是404个珠子
+            for (var i = 0; i < 410; i++)
             {
-                var deAddress = address + i * 16;
+                var deAddress = _decorationAddress + i * 16;
                 var code = _myOperator.ReadMemory(deAddress, 4);
                 count = code == 0 ? count + 1 : 0;
-
                 var number = _myOperator.ReadMemory(deAddress + 0x4, 4);
-                var name = code == 0 ? "空" : GetNameByCode(code);
-
+                var name = code == 0 ? "空" : _jsonHandler.GetNameByCode(code);
                 list.Add(new DecorationBean(name, code, number, deAddress));
 
-                if (count > 10)
-                {
-                    break;
-                }
+                if (count > 5) break;
             }
 
             return list;
         }
 
         /// <summary>
-        /// 通过代码获取名称
+        /// 访问玩家名称
         /// </summary>
-        /// <param name="code">代码</param>
-        /// <returns>名称</returns>
-        public string GetNameByCode(int code)
+        /// <returns>玩家名称</returns>
+        public string GetPlayerName()
         {
-            return _codeName.ContainsKey(code) ? _codeName[code] : "未知";
-        }
-
-        public int GetCodeByName(string name)
-        {
-            var code = 0;
-            foreach (var codeName in _codeName.Where(codeName => codeName.Value.Equals(name)))
+            var address = _decorationAddress - _jsonHandler.ReadNameSub();
+            const int byteLength = 64;
+            var nameByte = new byte[byteLength];
+            for (var i = 0; i < byteLength; i++)
             {
-                code = codeName.Key;
+                nameByte[i] = Convert.ToByte(_myOperator.ReadMemory(address + i, 1));
             }
-            return code;
+
+            return Encoding.UTF8.GetString(nameByte);
         }
 
         /// <summary>
@@ -164,10 +166,10 @@ namespace MHWDecorationsModifier.Code
         /// <returns>疑似特征码完整内容</returns>
         private byte[] GetLastBytes(long address)
         {
-            var bytes = new byte[_signature.Length];
-            for (var i = 0; i < _signature.Length; i++)
+            var bytes = new byte[_configSignature.Length];
+            for (var i = 0; i < _configSignature.Length; i++)
             {
-                bytes[i] = (byte) _myOperator.ReadMemory(address + i, 1);
+                bytes[i] = (byte)_myOperator.ReadMemory(address + i, 1);
             }
 
             return bytes;
