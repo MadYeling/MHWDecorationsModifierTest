@@ -58,7 +58,7 @@ namespace MHWDecorationsModifier.xaml
             var number = Convert.ToInt32(DecorationNumber.Text);
             var newDecoration = new DecorationBean(name, decCode, number, _decoration.Address);
             var res = _memoryHandler.ChangeDecoration(newDecoration);
-            Logger.Debug($"\r\n将{_decoration}\r\n更改为 {newDecoration}\r\n更改结果：{res}");
+            Logger.Debug($"\r\n将\t\t{_decoration}\r\n更改为\t{newDecoration}\r\n更改结果：{res}");
             ((MainWindow)Owner).ForceRefreshUi();
             Close();
         }

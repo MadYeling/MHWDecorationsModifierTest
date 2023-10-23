@@ -29,7 +29,7 @@ namespace MHWDecorationsModifierTest
         /// <summary>
         /// 需要特征码中的第几位用来扫描
         /// </summary>
-        private const int Deviation = 4;
+        private const int Deviation = 0;
 
         private static int _archive;
 
@@ -93,7 +93,7 @@ namespace MHWDecorationsModifierTest
         /// 通过扫描指定内存段，获取珠子所在内存段的起始地址
         /// </summary>
         /// <returns>地址</returns>
-        private long GetDecorationsAddress()
+        public long GetDecorationsAddress()
         {
             var archiveBean = _jsonHandler.ReadArchiveBean(_archive);
             var startScanAddress = archiveBean.FirstScanAddress + Deviation;

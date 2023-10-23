@@ -24,9 +24,9 @@
             </Menu>
         </DockPanel>
         <UniformGrid Margin="0,25,0,40" Rows="5" Columns="10" x:Name="UniformGrid" />
-        <Button Content="下一页" HorizontalAlignment="Left" Margin="450,486,0,0"
+        <Button Content="下一页" HorizontalAlignment="Left" Margin="450,480,0,0"
                 VerticalAlignment="Top" Width="75" x:Name="NextPage" Click="NextPage_OnClick" />
-        <Button Content="上一页" HorizontalAlignment="Left" Margin="310,486,0,0"
+        <Button Content="上一页" HorizontalAlignment="Left" Margin="310,480,0,0"
                 VerticalAlignment="Top" Width="75" x:Name="FrontPage" Click="FrontPage_OnClick" />
     </Grid>
 </mah:MetroWindow>

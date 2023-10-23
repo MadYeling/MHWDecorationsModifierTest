@@ -1,21 +1,21 @@
 ﻿{
   "ProcessName": "MonsterHunterWorld",
-  "Signature": "A0 B2 10 43 01 00 00 00 00 00 00 00 ?? ?? 00 00 48 AD F6 42 01 00 00 00",
+  "Signature": "07 00 02 00 00 00 00 48 7A F1 42 01 00 00 00",
   "interval": "10000",
-  "subtraction": "1F38",
+  "subtraction": "3F107",
   "name": "3F0E0",
   "Archive": {
     "Archive1": {
-      "firstScanAddress": "150010E8",
-      "lastScanAddress": "F50010E8"
+      "firstScanAddress": "150000A9",
+      "lastScanAddress": "F50000A9"
     },
     "Archive2": {
-      "firstScanAddress": "1500FAD8",
-      "lastScanAddress": "F500FAD8"
+      "firstScanAddress": "1500CCA9",
+      "lastScanAddress": "F500CCA9"
     },
     "Archive3": {
-      "firstScanAddress": "1500E4C8",
-      "lastScanAddress": "F500E4C8"
+      "firstScanAddress": "150098A9",
+      "lastScanAddress": "F50098A9"
     }
   },
   "Decorations": {

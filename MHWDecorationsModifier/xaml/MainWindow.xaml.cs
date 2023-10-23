@@ -100,7 +100,7 @@ namespace MHWDecorationsModifier.xaml
         /// <param name="e"></param>
         private void Teach_OnClick(object sender, RoutedEventArgs e)
         {
-            var proc = new Process { StartInfo = { FileName = "https://www.bilibili.com/video/av70022048" } };
+            var proc = new Process { StartInfo = { FileName = "" } };
             proc.Start();
         }
 

@@ -33,7 +33,7 @@ namespace MHWDecorationsModifier.Code
         /// <summary>
         /// 需要特征码中的第几位用来扫描
         /// </summary>
-        private const int Deviation = 4;
+        private const int Deviation = 0;
 
         private readonly long _decorationAddress;
 
@@ -93,7 +93,7 @@ namespace MHWDecorationsModifier.Code
                 var b = _myOperator.ReadMemory(i, 1);
                 if (b != _oneByteConfigSignature || !CompareWithSignature(GetLastBytes(i - Deviation))) continue;
                 Logger.Debug("寻找到特征码的地址为：" + $"{i - Deviation:X8}");
-                return i - Deviation - subtraction;
+                return i - Deviation + subtraction;
             }
 
             Logger.Error("无法寻找到特征码");

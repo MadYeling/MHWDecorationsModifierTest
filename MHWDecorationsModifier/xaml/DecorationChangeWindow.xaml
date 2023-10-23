@@ -7,7 +7,7 @@
                  mc:Ignorable="d"
                  Title="DecorationChangeWindow"
                  Height="150" Width="300"
-                 WindowStartupLocation="CenterScreen"
+                 WindowStartupLocation="CenterOwner"
                  ResizeMode="NoResize">
     <Canvas>
         <ComboBox Name="SelectDecoration" FontSize="14" Height="30" Width="150" Canvas.Left="10" Canvas.Top="11"
