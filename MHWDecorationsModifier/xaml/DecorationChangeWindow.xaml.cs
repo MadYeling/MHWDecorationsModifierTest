@@ -35,7 +35,7 @@ namespace MHWDecorationsModifier.xaml
             var selectIndex = 0;
             foreach (var dec in allDecorations)
             {
-                categoryList.Add(new CategoryInfo { Name = dec.Value, Value = dec.Key.ToString() });
+                categoryList.Add(new CategoryInfo { Name = dec.Value, Value = dec.Key });
                 if (dec.Key == _decoration.Code)
                 {
                     selectIndex = count;

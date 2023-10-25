@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Web.UI.WebControls.Adapters;
 using System.Windows;
 using System.Windows.Documents;
 using MHWDecorationsModifier.Beans;
@@ -17,11 +19,6 @@ namespace MHWDecorationsModifier.xaml
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        /// <summary>
-        /// 要读取的存档号
-        /// </summary>
-        private readonly int _archive;
-
         private int _nowPage = 1;
 
         private int _maxPage = 1;
@@ -30,13 +27,17 @@ namespace MHWDecorationsModifier.xaml
 
         private MemoryHandler _memoryHandler;
 
-        public MainWindow()
+        private readonly MemoryBean _memoryInfo;
+
+        public MainWindow(Window owner, MemoryBean memoryInfo)
         {
             InitializeComponent();
-            // 添加关闭方法
-            Closing += Window_Closing;
-            // 刚打开程序弹出提示框选择存档
-            _archive = MyMessageBox.Show();
+            Closing += (sender, args) =>
+            {
+                Hide();
+                owner.ShowDialog();
+            };
+            _memoryInfo = memoryInfo;
             Init();
         }
 
@@ -45,8 +46,8 @@ namespace MHWDecorationsModifier.xaml
         /// </summary>
         private void Init()
         {
-            _memoryHandler = new MemoryHandler(_archive);
-            Title = $"玩家名称: {_memoryHandler.GetPlayerName()}";
+            _memoryHandler = new MemoryHandler();
+            Title = $"玩家名称: {_memoryHandler.GetPlayerName(_memoryInfo)}";
 
             // 向UniformGrid中添加自定义控件
             for (var i = 0; i < 50; i++)
@@ -63,26 +64,6 @@ namespace MHWDecorationsModifier.xaml
         }
 
         /// <summary>
-        /// 窗口关闭方法，添加确认框
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void Window_Closing(object sender, CancelEventArgs e)
-        {
-            if (MessageBox.Show("是否退出应用？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
-                MessageBoxResult.Yes)
-            {
-                e.Cancel = false;
-                // 关闭应用
-                Application.Current.Shutdown();
-            }
-            else
-            {
-                e.Cancel = true;
-            }
-        }
-
-        /// <summary>
         /// 菜单中的退出按钮
         /// 使用Close()将会正常调用Window_Closing()方法
         /// </summary>
@@ -90,7 +71,12 @@ namespace MHWDecorationsModifier.xaml
         /// <param name="e"></param>
         private void Exit_OnClick(object sender, RoutedEventArgs e)
         {
-            Close();
+            if (MessageBox.Show("是否退出应用？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Warning) ==
+                MessageBoxResult.Yes)
+            {
+                // 关闭应用
+                Environment.Exit(0);
+            }
         }
 
         /// <summary>
@@ -100,7 +86,8 @@ namespace MHWDecorationsModifier.xaml
         /// <param name="e"></param>
         private void Teach_OnClick(object sender, RoutedEventArgs e)
         {
-            var proc = new Process { StartInfo = { FileName = "" } };
+            var proc = new Process
+                { StartInfo = { FileName = "https://github.com/MadYeling/MHWDecorationsModifierTest" } };
             proc.Start();
         }
 
@@ -164,7 +151,7 @@ namespace MHWDecorationsModifier.xaml
         public void ForceRefreshUi()
         {
             Logger.Debug("强制刷新UI");
-            _allDecorations = _memoryHandler.GetArchiveDecorations();
+            _allDecorations = _memoryHandler.GetArchiveDecorations(_memoryInfo);
             RefreshUi();
         }
     }

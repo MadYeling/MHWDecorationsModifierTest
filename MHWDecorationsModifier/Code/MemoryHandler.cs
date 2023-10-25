@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MHWDecorationsModifier.Beans;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using NLog;
 
@@ -33,20 +35,16 @@ namespace MHWDecorationsModifier.Code
         /// <summary>
         /// 需要特征码中的第几位用来扫描
         /// </summary>
-        private const int Deviation = 0;
+        private readonly int _deviation;
 
-        private readonly long _decorationAddress;
 
-        private static int _archive;
-
-        public MemoryHandler(int archive = JsonHandler.Archive1)
+        public MemoryHandler()
         {
             _myOperator = new MemoryOperator();
             _jsonHandler = new JsonHandler();
-            _archive = archive;
             _configSignature = _jsonHandler.ReadSignature();
             _oneByteConfigSignature = GetOneByteConfigSignature();
-            _decorationAddress = GetDecorationsAddress();
+            _deviation = _jsonHandler.ReadDeviation();
         }
 
         /// <summary>
@@ -55,7 +53,7 @@ namespace MHWDecorationsModifier.Code
         /// <returns>一位特征码</returns>
         private byte GetOneByteConfigSignature()
         {
-            return Convert.ToByte(_configSignature[Deviation], 16);
+            return Convert.ToByte(_configSignature[_deviation], 16);
         }
 
         /// <summary>
@@ -77,44 +75,53 @@ namespace MHWDecorationsModifier.Code
         }
 
         /// <summary>
+        /// 用于回调进度的委托
+        /// </summary>
+        public delegate void GetProgressPercent(float percent);
+
+        /// <summary>
         /// 通过扫描指定内存段，获取珠子所在内存段的起始地址
         /// </summary>
         /// <returns>地址</returns>
-        private long GetDecorationsAddress()
+        public MemoryBean GetDecorationsAddress(int archive, GetProgressPercent func)
         {
-            var archiveBean = _jsonHandler.ReadArchiveBean(_archive);
-            var startScanAddress = archiveBean.FirstScanAddress + Deviation;
-            var lastScanAddress = archiveBean.LastScanAddress + Deviation;
+            var archiveBean = _jsonHandler.ReadArchiveBean(archive);
+            var startScanAddress = archiveBean.FirstScanAddress + _deviation;
+            var lastScanAddress = archiveBean.LastScanAddress + _deviation;
             var interval = _jsonHandler.ReadInterval();
             var subtraction = _jsonHandler.ReadSubtraction();
-
             for (var i = startScanAddress; i < lastScanAddress; i += interval)
             {
                 var b = _myOperator.ReadMemory(i, 1);
-                if (b != _oneByteConfigSignature || !CompareWithSignature(GetLastBytes(i - Deviation))) continue;
-                Logger.Debug("寻找到特征码的地址为：" + $"{i - Deviation:X8}");
-                return i - Deviation + subtraction;
+                var percent = (float)(i - startScanAddress) / (float)(lastScanAddress - startScanAddress) * 100;
+                func(percent);
+                if (b != _oneByteConfigSignature || !CompareWithSignature(GetLastBytes(i - _deviation))) continue;
+                Logger.Debug("寻找到特征码的地址为：" + $"{i - _deviation:X8}");
+                func(100);
+                var decorationAddress = i - _deviation + subtraction;
+                var nameAddress = i - _deviation + _jsonHandler.ReadNameSub();
+                return new MemoryBean(nameAddress, decorationAddress);
             }
 
             Logger.Error("无法寻找到特征码");
-            return 0;
+            return null;
         }
 
         /// <summary>
         /// 获得拥有的珠子集合
         /// </summary>
         /// <returns>珠子集合</returns>
-        public List<DecorationBean> GetArchiveDecorations()
+        public List<DecorationBean> GetArchiveDecorations(MemoryBean memoryInfo)
         {
-            Logger.Debug($"起始地址：{_decorationAddress:X8}, 开始获取珠子列表");
+            Logger.Debug($"起始地址：{memoryInfo.DecorationAddress:X8}, 开始获取珠子列表");
             var list = new List<DecorationBean>();
-            if (_decorationAddress == 0) return list;
+            if (memoryInfo.DecorationAddress == 0) return list;
             var count = 0;
 
             // 目前一共应该是404个珠子
             for (var i = 0; i < 410; i++)
             {
-                var deAddress = _decorationAddress + i * 16;
+                var deAddress = memoryInfo.DecorationAddress + i * 16;
                 var code = _myOperator.ReadMemory(deAddress, 4);
                 count = code == 0 ? count + 1 : 0;
                 var number = _myOperator.ReadMemory(deAddress + 0x4, 4);
@@ -131,14 +138,13 @@ namespace MHWDecorationsModifier.Code
         /// 访问玩家名称
         /// </summary>
         /// <returns>玩家名称</returns>
-        public string GetPlayerName()
+        public string GetPlayerName(MemoryBean memoryInfo)
         {
-            var address = _decorationAddress - _jsonHandler.ReadNameSub();
             const int byteLength = 64;
             var nameByte = new byte[byteLength];
             for (var i = 0; i < byteLength; i++)
             {
-                nameByte[i] = Convert.ToByte(_myOperator.ReadMemory(address + i, 1));
+                nameByte[i] = Convert.ToByte(_myOperator.ReadMemory(memoryInfo.NameAddress + i, 1));
             }
 
             return Encoding.UTF8.GetString(nameByte);

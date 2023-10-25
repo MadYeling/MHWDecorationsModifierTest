@@ -1,9 +1,10 @@
 ﻿{
   "ProcessName": "MonsterHunterWorld",
   "Signature": "07 00 02 00 00 00 00 48 7A F1 42 01 00 00 00",
-  "interval": "10000",
-  "subtraction": "3F107",
-  "name": "3F0E0",
+  "Deviation": 0,
+  "Interval": "10000",
+  "DecorationHead": "3F107",
+  "NameHead": "27",
   "Archive": {
     "Archive1": {
       "firstScanAddress": "150000A9",

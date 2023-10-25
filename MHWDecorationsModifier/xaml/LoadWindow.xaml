@@ -1,0 +1,28 @@
+﻿<mah:MetroWindow x:Class="MHWDecorationsModifier.xaml.LoadWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:local="clr-namespace:MHWDecorationsModifier.xaml"
+                 xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=System"
+                 xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                 mc:Ignorable="d"
+                 Title="加载中，请稍后..."
+                 Height="150" Width="540"
+                 WindowStartupLocation="CenterScreen"
+                 ResizeMode="NoResize">
+    <Window.Resources>
+        <componentModel:BackgroundWorker
+            x:Name="BackgroundWorker"
+            x:Key="BackgroundWorker"
+            DoWork="BackgroundWorker_OnDoWork"
+            ProgressChanged="BackgroundWorker_OnProgressChanged"
+            RunWorkerCompleted="BackgroundWorker_OnRunWorkerCompleted"
+            WorkerReportsProgress="True"
+            />
+    </Window.Resources>
+    <Canvas>
+        <Label Name="LoadText" Content="正在加载存档..." Canvas.Left="20" Canvas.Top="20" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <ProgressBar Name="LoadProgressBar"  Width="500px" Canvas.Left="20" Canvas.Top="50" HorizontalAlignment="Center" Height="30" VerticalAlignment="Top"/>
+    </Canvas>
+</mah:MetroWindow>

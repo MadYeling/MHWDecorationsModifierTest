@@ -80,6 +80,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beans\MemoryBean.cs" />
     <Compile Include="Code\JsonHandler.cs" />
     <Compile Include="Code\MemoryHandler.cs" />
     <Compile Include="Code\MemoryOperator.cs" />
@@ -92,12 +93,15 @@
     <Compile Include="xaml\DecorationChangeWindow.xaml.cs">
       <DependentUpon>DecorationChangeWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="xaml\LoadWindow.xaml.cs">
+      <DependentUpon>LoadWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="xaml\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="xaml\MyMessageBox.xaml.cs">
-      <DependentUpon>MyMessageBox.xaml</DependentUpon>
+    <Compile Include="xaml\ChooseArchiveWindow.xaml.cs">
+      <DependentUpon>ChooseArchiveWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="xaml\UserControl1.xaml.cs">
       <DependentUpon>UserControl1.xaml</DependentUpon>
@@ -106,11 +110,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="xaml\LoadWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="xaml\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="xaml\MyMessageBox.xaml" />
+    <Page Include="xaml\ChooseArchiveWindow.xaml" />
     <Page Include="xaml\UserControl1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

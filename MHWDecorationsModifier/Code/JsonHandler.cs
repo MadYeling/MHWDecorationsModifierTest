@@ -35,9 +35,9 @@ namespace MHWDecorationsModifier.Code
         /// </summary>
         private readonly Dictionary<int, string> _codeName;
 
-        public const int Archive1 = 1;
-        public const int Archive2 = 2;
-        public const int Archive3 = 3;
+        public const int Archive1 = 0;
+        public const int Archive2 = 1;
+        public const int Archive3 = 2;
 
         /// <summary>
         /// 构造函数，只在这里读取文件
@@ -100,7 +100,7 @@ namespace MHWDecorationsModifier.Code
         {
             try
             {
-                const string keyWord = "interval";
+                const string keyWord = "Interval";
                 var token = VerifyKeyWord(keyWord, _jToken);
                 return Convert.ToInt32(token.ToString(), 16);
             }
@@ -119,14 +119,14 @@ namespace MHWDecorationsModifier.Code
         {
             try
             {
-                const string keyWord = "subtraction";
+                const string keyWord = "DecorationHead";
                 var token = VerifyKeyWord(keyWord, _jToken);
                 return Convert.ToInt32(token.ToString(), 16);
             }
             catch (Exception e)
             {
                 Logger.Error(e);
-                return 0x1F38;
+                return 0;
             }
         }
 
@@ -138,14 +138,33 @@ namespace MHWDecorationsModifier.Code
         {
             try
             {
-                const string keyWord = "name";
+                const string keyWord = "NameHead";
                 var token = VerifyKeyWord(keyWord, _jToken);
                 return Convert.ToInt32(token.ToString(), 16);
             }
             catch (Exception e)
             {
                 Logger.Error(e);
-                return 0x10000;
+                return 0;
+            }
+        }
+        
+        /// <summary>
+        /// 读取扫描位
+        /// </summary>
+        /// <returns>扫描位</returns>
+        public int ReadDeviation()
+        {
+            try
+            {
+                const string keyWord = "Deviation";
+                var token = VerifyKeyWord(keyWord, _jToken);
+                return token.Value<int>();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return 0;
             }
         }
 
