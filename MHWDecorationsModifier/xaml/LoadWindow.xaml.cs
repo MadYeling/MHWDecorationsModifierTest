@@ -31,20 +31,20 @@ namespace MHWDecorationsModifier.xaml
 
         private void BackgroundWorker_OnDoWork(object sender, DoWorkEventArgs e)
         {
+            // 让UI完成加载再开始任务
+            Thread.Sleep(500);
             for (var i = 0; i < 3; i++)
             {
                 // 跑太快了UI来不及反应，给UI点时间
                 Thread.Sleep(200);
                 var memoryInfo = _memoryHandler.GetDecorationsAddress(i,
-                    (percent) =>
-                    {
-                        _backgroundWorker.ReportProgress((int)percent);
-                    });
+                    (percent) => { _backgroundWorker.ReportProgress((int)percent); });
                 if (memoryInfo == null)
                 {
                     MessageBox.Show("不中嘞，特征码得更新了哥", "不中！", MessageBoxButton.OK, MessageBoxImage.Error);
                     Environment.Exit(0);
                 }
+
                 _memoryInfoList[i] = memoryInfo;
             }
         }
@@ -57,8 +57,9 @@ namespace MHWDecorationsModifier.xaml
         private void BackgroundWorker_OnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             LoadText.Content = "加载完成！";
+            Thread.Sleep(200);
             Hide();
-            new ChooseArchiveWindow(_memoryInfoList).Show();
+            new ChooseArchiveWindow(_memoryInfoList, _memoryHandler).Show();
         }
     }
 }

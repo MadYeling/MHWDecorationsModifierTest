@@ -50,10 +50,15 @@ namespace MHWDecorationsModifier.Code
             }
             else
             {
-                Logger.Debug("进程PID：" + _pid);
+                Logger.Debug($"进程PID：{_pid}");
             }
         }
 
+        /// <summary>
+        /// 由程序名称获取PID
+        /// </summary>
+        /// <param name="processName">程序名称</param>
+        /// <returns>PID</returns>
         private static int GetPidByName(string processName)
         {
             var processes = Process.GetProcessesByName(processName);
@@ -72,11 +77,11 @@ namespace MHWDecorationsModifier.Code
         {
             try
             {
-                //打开一个已存在的进程对象  0x1F0FFF 最高权限
+                // 打开一个已存在的进程对象  0x1F0FFF 最高权限
                 var hProcess = OpenProcess(0x1F0FFF, false, _pid);
-                //从指定内存中写入字节集数据
+                // 从指定内存中写入字节集数据
                 WriteProcessMemory(hProcess, (IntPtr)address, new[] { number }, 4, IntPtr.Zero);
-                //关闭操作
+                // 关闭操作
                 CloseHandle(hProcess);
                 return true;
             }
@@ -106,15 +111,15 @@ namespace MHWDecorationsModifier.Code
             try
             {
                 var buffer = new byte[byteLength];
-                //获取缓冲区地址
+                // 获取缓冲区地址
                 var byteAddress = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
-                ////打开一个已存在的进程对象  0x1F0FFF 最高权限
+                // 打开一个已存在的进程对象  0x1F0FFF 最高权限
                 var hProcess = OpenProcess(0x1F0FFF, false, _pid);
-                ////将制定内存中的值读入缓冲区
+                // 将指定内存中的值读入缓冲区
                 ReadProcessMemory(hProcess, new IntPtr(address), byteAddress, byteLength, IntPtr.Zero);
-                ////关闭操作
+                // 关闭操作
                 CloseHandle(hProcess);
-                ////从非托管内存中读取一个 32 位带符号整数。
+                // 从非托管内存中读取一个 32 位带符号整数。
                 var nub = Marshal.ReadInt32(byteAddress);
                 return nub;
             }

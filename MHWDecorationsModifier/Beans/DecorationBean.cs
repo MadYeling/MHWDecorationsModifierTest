@@ -20,7 +20,7 @@
 
         public override string ToString()
         {
-            return "珠子名称：" + Name + "    \t珠子代码：" + $"{Code:X4}" + "\t珠子数量：" + Number + "\t内存地址：" + $"{Address:x8}";
+            return $"珠子名称：{Name}    \t珠子代码：{Code:X4} \t珠子数量：{Number} \t内存地址：{Address:x8}";
         }
     }
 }

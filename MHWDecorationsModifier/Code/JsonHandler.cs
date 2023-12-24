@@ -81,7 +81,7 @@ namespace MHWDecorationsModifier.Code
             {
                 const string keyWord = "Signature";
                 var signatureToken = VerifyKeyWord(keyWord, _jToken);
-                Logger.Debug("特征码：" + signatureToken);
+                Logger.Debug($"特征码：{signatureToken}");
                 var signature = signatureToken.ToString().Split(' ');
                 return signature;
             }
@@ -148,7 +148,7 @@ namespace MHWDecorationsModifier.Code
                 return 0;
             }
         }
-        
+
         /// <summary>
         /// 读取扫描位
         /// </summary>
@@ -288,7 +288,7 @@ namespace MHWDecorationsModifier.Code
             // 校验
             var codeToken = iJToken[keyWord];
             if (codeToken != null) return codeToken;
-            Logger.Error("无法找到字段：\"" + keyWord + "\"");
+            Logger.Error($"无法找到字段：\"{keyWord}\"");
             throw new InvalidKeyWordException("无效的JSON字段！");
         }
 
@@ -300,9 +300,7 @@ namespace MHWDecorationsModifier.Code
         {
             try
             {
-                // 获取文件的完整路径
-                var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase)
-                               ?.Replace("file:\\", "") + "\\" + FileName;
+                var path = $"./{FileName}";
                 JToken jToken;
                 using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {

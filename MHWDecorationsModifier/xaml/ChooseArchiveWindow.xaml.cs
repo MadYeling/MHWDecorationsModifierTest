@@ -10,18 +10,16 @@ namespace MHWDecorationsModifier.xaml
 {
     public partial class ChooseArchiveWindow
     {
-        private MemoryBean _archive;
-
         private ComboBox _comboBox;
 
         private readonly MemoryHandler _memoryHandler;
         private readonly string[] _names = new string[3];
         private readonly MemoryBean[] _memoryInfos;
 
-        public ChooseArchiveWindow(MemoryBean[] memoryInfos)
+        public ChooseArchiveWindow(MemoryBean[] memoryInfos, MemoryHandler memoryHandler)
         {
             InitializeComponent();
-            _memoryHandler = new MemoryHandler();
+            _memoryHandler = memoryHandler;
             _memoryInfos = memoryInfos;
             Closing += OnClosing;
             Init();

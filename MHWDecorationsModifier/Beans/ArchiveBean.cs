@@ -4,8 +4,8 @@
     {
         public ArchiveBean(long firstScanAddress, long lastScanAddress)
         {
-            this.FirstScanAddress = firstScanAddress;
-            this.LastScanAddress = lastScanAddress;
+            FirstScanAddress = firstScanAddress;
+            LastScanAddress = lastScanAddress;
         }
 
         public long FirstScanAddress { get; set; }
@@ -14,7 +14,7 @@
 
         public override string ToString()
         {
-            return "扫描从 " + $"{FirstScanAddress:x8}" + " 至 " + $"{LastScanAddress:x8}";
+            return $"扫描从 {FirstScanAddress:x8} 至 {LastScanAddress:x8}";
         }
     }
 }

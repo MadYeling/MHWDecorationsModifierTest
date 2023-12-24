@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using MHWDecorationsModifier.Beans;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+using MHWDecorationsModifier.Beans;
 using NLog;
 
 namespace MHWDecorationsModifier.Code
@@ -93,10 +88,10 @@ namespace MHWDecorationsModifier.Code
             for (var i = startScanAddress; i < lastScanAddress; i += interval)
             {
                 var b = _myOperator.ReadMemory(i, 1);
-                var percent = (float)(i - startScanAddress) / (float)(lastScanAddress - startScanAddress) * 100;
+                var percent = (i - startScanAddress) / (float)(lastScanAddress - startScanAddress) * 100;
                 func(percent);
                 if (b != _oneByteConfigSignature || !CompareWithSignature(GetLastBytes(i - _deviation))) continue;
-                Logger.Debug("寻找到特征码的地址为：" + $"{i - _deviation:X8}");
+                Logger.Debug($"存档 {archive} 寻找到特征码的地址为：{i - _deviation:X8}");
                 func(100);
                 var decorationAddress = i - _deviation + subtraction;
                 var nameAddress = i - _deviation + _jsonHandler.ReadNameSub();
